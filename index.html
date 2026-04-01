@@ -868,7 +868,7 @@ select.dqi { display: none; }  /* hidden — replaced by custom dropdown */
   </div>
   <div class="dr-body">
     <p class="dr-note">The messier and more specific your notes, the better the draft. Edit before you post so it sounds like you.</p>
-    <div id="api-notice" style="display:none;background:rgba(224,92,92,0.12);border:2px solid var(--coral);padding:10px 14px;margin-bottom:18px;font-size:13px;color:var(--coral);line-height:1.6">
+    <div id="api-notice" style="display:none" style="display:none;background:rgba(224,92,92,0.12);border:2px solid var(--coral);padding:10px 14px;margin-bottom:18px;font-size:13px;color:var(--coral);line-height:1.6">
       ⚠ API key not set. To enable AI drafts, open the HTML file, find Please ask Sara to sort the API key.
     </div>
     <!-- BUZZFEED QUIZ -->
@@ -1810,13 +1810,10 @@ async function generate() {
   var msg = 'Topic: '+(sq||'general')+'\nWhat happened: '+q1+(q2?'\nNotes: '+q2:'');
 
   try {
-    var resp = await fetch('https://api.anthropic.com/v1/messages', {
+    var resp = await fetch('https://post-with-intent-proxy.sara-690.workers.dev', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': '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',
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
@@ -1893,7 +1890,7 @@ async function generate() {
     document.getElementById('da').classList.add('show');
     document.getElementById('db').classList.add('show');
     showToast('API KEY NOT SET');
-    document.getElementById('api-notice').style.display = 'block';
+    // api notice removed
   }
 
   document.getElementById('gen-btn').disabled = false;

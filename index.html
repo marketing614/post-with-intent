@@ -1519,8 +1519,19 @@ var bingoState = JSON.parse(localStorage.getItem('pwi_bingo') || '{}');
 
 
 // ── POST LOGGING ─────────────────────────────────────────────────────────────
-var loggedPosts = []; async function loadPostsFromNotion() {   try {     const res = await fetch('https://post-with-intent-proxy.sara-690.workers.dev/api/leaderboard');     const data = await res.json();     loggedPosts = Object.entries(data.posts).flatMap(([person, posts]) =>       posts.map(p => ({ name: person, url: p.url, date: p.date }))     );     renderLB(); renderAvatars();   } catch(e) { console.error('Failed to load posts', e); } } loadPostsFromNotion();
-
+var loggedPosts = [];
+async function loadPostsFromNotion() {
+  try {
+    const res = await fetch('https://post-with-intent-proxy.sara-690.workers.dev/api/leaderboard');
+    const data = await res.json();
+    loggedPosts = Object.entries(data.posts).flatMap(([person, posts]) =>
+      posts.map(p => ({ name: person, url: p.url, date: p.date }))
+    );
+    renderLB(); renderAvatars();
+  } catch(e) { console.error('Failed to load posts', e); }
+}
+loadPostsFromNotion();
+   
 function openLogPost() {
   var nameEl = document.getElementById('log-who-name');
   if (nameEl) nameEl.textContent = me ? me.n : 'nobody — pick your name first';
@@ -1667,7 +1678,7 @@ function renderLB() {
     else { el.className = 'mm far'; }
   });
   var gapEl = document.getElementById('gap-label'); if(gapEl) gapEl.textContent = TP < 100 ? ('&#9660; ' + (100-TP) + ' TO CLOSE THE GAP') : '&#10003; TARGET HIT';
-  var sorted = TEAM.slice().sort(function(a,b){ return b.p - a.p; });
+  var counts = {}; loggedPosts.forEach(function(p){ counts[p.name] = (counts[p.name]||0) + 1; }); TEAM.forEach(function(t){ t.p = counts[t.n] || 0; }); TP = TEAM.reduce(function(s,t){ return s + (t.p||0); }, 0); var sorted = TEAM.slice().sort(function(a,b){ return b.p - a.p; });
   var html = '';
   sorted.forEach(function(t, i) {
     var you = me && me.n === t.n;
@@ -2309,7 +2320,6 @@ var BINGO_SQUARES = [
 
 
 // ── POST LOGGING ─────────────────────────────────────────────────────────────
-fetch('https://post-with-intent-proxy.sara-690.workers.dev/api/log-post', {   method: 'POST',   headers: {'Content-Type': 'application/json'},   body: JSON.stringify({ person: me.n, linkedinUrl: url, date: new Date().toISOString().split('T')[0] }) });
 
 function openLogPost() {
   var nameEl = document.getElementById('log-who-name');

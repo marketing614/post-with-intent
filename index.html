@@ -1549,15 +1549,6 @@ function submitLogPost() {
   var already = loggedPosts.find(function(p){ return p.url === url; });
   if (already) { showToast('ALREADY LOGGED'); return; }
 
-  // Add the post
-  var post = { name: me.n, url: url, date: new Date().toLocaleDateString('en-GB', {day:'numeric',month:'short'}) };
-  loggedPosts.push(post);
-  fetch('https://post-with-intent-proxy.sara-690.workers.dev/api/log-post', {
-  method: 'POST',
-  headers: {'Content-Type': 'application/json'},
-  body: JSON.stringify({ person: me.n, linkedinUrl: url, date: new Date().toISOString().split('T')[0] })
-});
-
   // Update team score
   var member = TEAM.find(function(t){ return t.n === me.n; });
   if (member) {

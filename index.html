@@ -1082,7 +1082,7 @@ function drawWorld() {
 
   var postedCount = TEAM.filter(function(t){ return t.posted; }).length;
   var ratio = postedCount / TEAM.length;
-  var teamRatio = Math.min(1, TP / 100);
+  var teamRatio = Math.min(1, TP / 35);
 
   // ── SKY ──
   var skyTop, skyBot;
@@ -1654,12 +1654,12 @@ function checkBingoWin() {
 function renderLB() {
   calcFollowerGain();
   var hnEl = document.getElementById('hn'); if(hnEl) hnEl.textContent = TP;
-  var srEl = document.getElementById('s-remain'); if(srEl) srEl.textContent = Math.max(0, 100-TP);
+  var srEl = document.getElementById('s-remain'); if(srEl) srEl.textContent = Math.max(0, 35-TP);
   var wh = document.getElementById('weather-hint');
   if(wh) wh.textContent = TP===0 ? 'Post something to change the weather...' : TP<6 ? 'The sun is trying to come out...' : TP<30 ? 'Getting brighter with every post' : '';
   var pfEl = document.getElementById('prog-fill'); if(pfEl) pfEl.style.width = Math.min(100, TP) + '%';
   var pctEl = document.getElementById('prog-pct'); if(pctEl) pctEl.textContent = Math.min(100, TP) + '%';
-  var mms = [{id:'mm-6',n:6},{id:'mm-18',n:18},{id:'mm-30',n:30},{id:'mm-54',n:54},{id:'mm-100',n:100}];
+  var mms = [{id:'mm-6',n:6},{id:'mm-18',n:12},{id:'mm-30',n:18},{id:'mm-54',n:25},{id:'mm-100',n:35}];
   var nextSet = false;
   mms.forEach(function(m) {
     var el = document.getElementById(m.id);
@@ -1668,7 +1668,7 @@ function renderLB() {
     else if (!nextSet) { el.className = 'mm next'; nextSet = true; }
     else { el.className = 'mm far'; }
   });
-  var gapEl = document.getElementById('gap-label'); if(gapEl) gapEl.textContent = TP < 100 ? ('&#9660; ' + (100-TP) + ' TO CLOSE THE GAP') : '&#10003; TARGET HIT';
+  var gapEl = document.getElementById('gap-label'); if(gapEl) gapEl.textContent = TP < 100 ? ('&#9660; ' + (35-TP) + ' TO CLOSE THE GAP') : '&#10003; TARGET HIT';
   var counts = {}; loggedPosts.forEach(function(p){ counts[p.name] = (counts[p.name]||0) + 1; }); TEAM.forEach(function(t){ t.p = counts[t.n] || 0; }); TP = TEAM.reduce(function(s,t){ return s + (t.p||0); }, 0); var sorted = TEAM.slice().sort(function(a,b){ return b.p - a.p; });
   var html = '';
   sorted.forEach(function(t, i) {

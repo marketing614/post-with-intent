@@ -732,7 +732,7 @@ select.dqi { display: none; }  /* hidden — replaced by custom dropdown */
     </div>
     <div class="world-overlay">
       <div class="world-score-box">
-        <div class="world-score-n"><span id="hn">0</span><span style="font-size:14px;color:var(--cream2)">/100</span></div>
+        <div class="world-score-n"><span id="hn">0</span><span style="font-size:14px;color:var(--cream2)">/35</span></div>
         <div class="world-score-label">POSTS PUBLISHED</div>
         <div class="world-score-remain">▼ <span id="s-remain">0</span> TO CLOSE THE GAP</div>
       </div>
@@ -756,10 +756,10 @@ select.dqi { display: none; }  /* hidden — replaced by custom dropdown */
     <div class="milestone-markers">
       <div class="mm hit" id="mm-start"><span class="mm-ico">🚦</span><span>START</span></div>
       <div class="mm far" id="mm-6"><span class="mm-ico">🟩</span><span>6</span></div>
-      <div class="mm far" id="mm-18"><span class="mm-ico">👻</span><span>18</span></div>
-      <div class="mm far" id="mm-30"><span class="mm-ico">🔥</span><span>30</span></div>
-      <div class="mm far" id="mm-54"><span class="mm-ico">⭐</span><span>54</span></div>
-      <div class="mm far" id="mm-100"><span class="mm-ico">🏆</span><span>100</span></div>
+      <div class="mm far" id="mm-18"><span class="mm-ico">👻</span><span>12</span></div>
+      <div class="mm far" id="mm-30"><span class="mm-ico">🔥</span><span>18</span></div>
+      <div class="mm far" id="mm-54"><span class="mm-ico">⭐</span><span>25</span></div>
+      <div class="mm far" id="mm-100"><span class="mm-ico">🏆</span><span>35</span></div>
     </div>
   </div>
 
@@ -959,7 +959,7 @@ var TEAM = [
   {n:'Sara',    full:'Sara',            c:'#f4c430', p:0, s:'building', posted:false, followers:1282},
   {n:'Jon',     full:'Jon',          c:'#5b8dd9', p:0, s:'building', posted:false, followers:707},
   {n:'Charley', full:'Charley',         c:'#4ecb71', p:0, s:'building', posted:false, followers:1486},
-  {n:'DanDan',  full:'Dan',                  c:'#9b59b6', p:0, s:'building', posted:false, followers:1788}
+  {n:'Dan',     full:'Dan',                  c:'#9b59b6', p:0, s:'building', posted:false, followers:1788}
 ];
 
 var TP = 0;
@@ -1657,8 +1657,8 @@ function renderLB() {
   var srEl = document.getElementById('s-remain'); if(srEl) srEl.textContent = Math.max(0, 35-TP);
   var wh = document.getElementById('weather-hint');
   if(wh) wh.textContent = TP===0 ? 'Post something to change the weather...' : TP<6 ? 'The sun is trying to come out...' : TP<30 ? 'Getting brighter with every post' : '';
-  var pfEl = document.getElementById('prog-fill'); if(pfEl) pfEl.style.width = Math.min(100, TP) + '%';
-  var pctEl = document.getElementById('prog-pct'); if(pctEl) pctEl.textContent = Math.min(100, TP) + '%';
+  var pfEl = document.getElementById('prog-fill'); if(pfEl) pfEl.style.width = Math.round(Math.min(1, TP/35)*100) + '%';
+  var pctEl = document.getElementById('prog-pct'); if(pctEl) pctEl.textContent = Math.round(Math.min(1, TP/35)*100) + '%';
   var mms = [{id:'mm-6',n:6},{id:'mm-18',n:12},{id:'mm-30',n:18},{id:'mm-54',n:25},{id:'mm-100',n:35}];
   var nextSet = false;
   mms.forEach(function(m) {
@@ -1668,7 +1668,7 @@ function renderLB() {
     else if (!nextSet) { el.className = 'mm next'; nextSet = true; }
     else { el.className = 'mm far'; }
   });
-  var gapEl = document.getElementById('gap-label'); if(gapEl) gapEl.textContent = TP < 100 ? ('&#9660; ' + (35-TP) + ' TO CLOSE THE GAP') : '&#10003; TARGET HIT';
+  var gapEl = document.getElementById('gap-label'); if(gapEl) gapEl.textContent = TP < 35 ? ('&#9660; ' + (35-TP) + ' TO CLOSE THE GAP') : '&#10003; TARGET HIT';
   var counts = {}; loggedPosts.forEach(function(p){ counts[p.name] = (counts[p.name]||0) + 1; }); TEAM.forEach(function(t){ t.p = counts[t.n] || 0; }); TP = TEAM.reduce(function(s,t){ return s + (t.p||0); }, 0); var sorted = TEAM.slice().sort(function(a,b){ return b.p - a.p; });
   var html = '';
   sorted.forEach(function(t, i) {
@@ -1701,7 +1701,7 @@ function renderAvatars() {
     div.title = "See " + t.n + " posts";
     div.onclick = function() { openPersonDrawer(t.n); };
     div.innerHTML = '<div class="avatar-tick">&#10003;</div>'
-      + '<div class="avatar-name">'+t.n.slice(0,6)+'</div>'
+      + '<div class="avatar-name">'+t.n+'</div>'
       + (posted && t.p > 0 ? '<div style="font-size:9px;font-weight:800;color:var(--gold);line-height:1;margin-top:2px">'+t.p+'</div>' : '');
     container.appendChild(div);
   });
@@ -1822,7 +1822,7 @@ async function generate() {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-sonnet-4-6',
         max_tokens: 700,
         stream: true,
         system: sys,

@@ -1541,35 +1541,6 @@ function openLogPost() {
   openM('log-modal');
 }
 
-function submitLogPost() {
-  if (!me) { showToast('PICK YOUR NAME FIRST'); return; }
-  var url = document.getElementById('log-url-input').value.trim();
-  if (!url || !url.includes('linkedin.com')) { showToast('PASTE A VALID LINKEDIN URL'); return; }
-  // Check not already logged
-  var already = loggedPosts.find(function(p){ return p.url === url; });
-  if (already) { showToast('ALREADY LOGGED'); return; }
-
-  // Update team score
-  var member = TEAM.find(function(t){ return t.n === me.n; });
-  if (member) {
-    member.p = (member.p || 0) + 1;
-    member.posted = true;
-  }
-  TP = TEAM.reduce(function(s,t){ return s + (t.p||0); }, 0);
-
-  renderLB();
-  renderAvatars();
-  renderBingo();
-  renderPostLogList();
-
-  var resultEl = document.getElementById('log-result');
-  resultEl.textContent = 'Logged! +1 point for ' + me.n + '. Total: ' + TP + ' posts.';
-  resultEl.style.display = 'block';
-  document.getElementById('log-url-input').value = '';
-  renderLogHistory();
-  showToast('+1 POINT LOGGED');
-}
-
 function renderLogHistory() {
   var el = document.getElementById('log-history');
   if (!el || !loggedPosts.length) { if(el) el.innerHTML = ''; return; }
@@ -1816,7 +1787,7 @@ async function generate() {
   var msg = 'Topic: '+(sq||'general')+'\nWhat happened: '+q1+(q2?'\nNotes: '+q2:'');
 
   try {
-    var resp = await fetch('https://post-with-intent-proxy.sara-690.workers.dev', {
+    var resp = await fetch('https://post-with-intent-proxy.sara-690.workers.dev/api/claude', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -2352,6 +2323,14 @@ function submitLogPost() {
   document.getElementById('log-url-input').value = '';
   renderLogHistory();
   showToast('+1 POINT LOGGED');
+
+  // Save to Notion via Cloudflare so the point persists after refresh
+  var today = new Date().toISOString().split('T')[0];
+  fetch('https://post-with-intent-proxy.sara-690.workers.dev/api/log-post', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ person: me.n, linkedinUrl: url, date: today })
+  }).catch(function(e) { console.error('Failed to save to Notion', e); });
 }
 
 function renderLogHistory() {

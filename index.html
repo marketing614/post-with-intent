@@ -718,6 +718,7 @@ select.dqi { display: none; }  /* hidden — replaced by custom dropdown */
       <div class="live-dot-wrap"><div class="live-dot"></div>LIVE</div>
       <button class="user-btn" id="u-btn" onclick="openWho()">▶ ADD YOUR NAME</button>
       <button class="user-btn" onclick="openRules()" style="color:var(--cream2)">RULES &amp; INFO</button>
+      <button class="user-btn" onclick="loadPostsFromNotion()" style="color:var(--cream2)" title="Refresh scores from Notion">↻ REFRESH</button>
     <button class="user-btn" onclick="openLogPost()" style="background:var(--green);color:var(--bg);font-weight:800;border:none;padding:6px 14px;cursor:pointer">+ LOG POST</button>
     </div>
   </div>
@@ -1490,16 +1491,16 @@ var BINGO_SQUARES = [
   {id:'100-words',       emoji:'📏',  label:'Post under 100 words',         done:false},
   {id:'client-win',      emoji:'🏆',  label:'Shared a client win',          done:false},
   // Row 2
-  {id:'carousel',        emoji:'🎠',  label:'First carousel post',          done:false},
+  {id:'off-topic',       emoji:'🌍',  label:'Posted about something unrelated to ecomm', done:false},
   {id:'short-hook',      emoji:'⚡',  label:'Post that opens with 5 words or fewer', done:false},
-  {id:'agentic-post',    emoji:'⚡',  label:'Posted about Agentic Campaigns', done:false},
+  {id:'no-buzzwords',    emoji:'🚿',  label:'Post with zero buzzwords',     done:false},
   {id:'hot-take',        emoji:'🔥',  label:'Posted a hot take',            done:false},
   {id:'3-in-week',       emoji:'📅',  label:'3 posts in one week',          done:false},
   // Row 3
   {id:'discounting-post',emoji:'💸',  label:'Used the 83% discount stat',   done:false},
   {id:'personal-story',  emoji:'🌱',  label:'Shared a personal story',      done:false},
   {id:'FREE',            emoji:'⭐',  label:'FREE',                          done:true},
-  {id:'video',           emoji:'🎬',  label:'First video post',             done:false},
+  {id:'no-ai-edits',     emoji:'✋',  label:'Wrote it, didn\'t edit the AI output', done:false},
   {id:'analogy-post',    emoji:'🧠',  label:'Post using a real-life analogy', done:false},
   // Row 4
   {id:'granola-post',    emoji:'🦙',  label:'Post from a Granola insight',  done:false},
@@ -1644,6 +1645,12 @@ function checkBingoWin() {
 
 
 function renderLB() {
+  // Recalculate scores first so everything below uses fresh data on the very first call
+  var counts = {};
+  loggedPosts.forEach(function(p){ counts[p.name] = (counts[p.name]||0) + 1; });
+  TEAM.forEach(function(t){ t.p = counts[t.n] || 0; });
+  TP = TEAM.reduce(function(s,t){ return s + (t.p||0); }, 0);
+
   calcFollowerGain();
   var hnEl = document.getElementById('hn'); if(hnEl) hnEl.textContent = TP;
   var srEl = document.getElementById('s-remain'); if(srEl) srEl.textContent = Math.max(0, 35-TP);
@@ -1661,7 +1668,7 @@ function renderLB() {
     else { el.className = 'mm far'; }
   });
   var gapEl = document.getElementById('gap-label'); if(gapEl) gapEl.textContent = TP < 35 ? ('&#9660; ' + (35-TP) + ' TO CLOSE THE GAP') : '&#10003; TARGET HIT';
-  var counts = {}; loggedPosts.forEach(function(p){ counts[p.name] = (counts[p.name]||0) + 1; }); TEAM.forEach(function(t){ t.p = counts[t.n] || 0; }); TP = TEAM.reduce(function(s,t){ return s + (t.p||0); }, 0); var sorted = TEAM.slice().sort(function(a,b){ return b.p - a.p; });
+  var sorted = TEAM.slice().sort(function(a,b){ return b.p - a.p; });
   var html = '';
   sorted.forEach(function(t, i) {
     var you = me && me.n === t.n;
@@ -2287,19 +2294,7 @@ function showToast(msg){
 
 // ── INIT ─────────────────────────────────────────────────────────────────────
 
-// ── BINGO BOARD ──────────────────────────────────────────────────────────────
-var BINGO_SQUARES = [
-  // Row 1
-  ['Client story', 'Hot take on ecomm', 'Intent gap explainer', 'Team behind the scenes', 'Product feature you love'],
-  // Row 2
-  ['Hesitation signal spotted', 'Something you learned', 'Unpopular opinion', 'Shopper mindset moment', 'Tool or workflow tip'],
-  // Row 3
-  ['A win this month', 'Conversion myth', 'FREE — post anything', 'Question for your network', 'Behind a data point'],
-  // Row 4
-  ['Signal vs noise', 'A client mindset shift', 'What intent is not', 'Personal career story', 'Something that surprised you'],
-  // Row 5
-  ['A bad UX spotted', 'Ecomm trend take', 'Show your work', 'Podcast or book rec', 'The intent gap in real life']
-];
+// (duplicate BINGO_SQUARES removed — using the full version defined above)
 
 
 // ── POST LOGGING ─────────────────────────────────────────────────────────────
@@ -2368,23 +2363,9 @@ function renderLogHistory() {
 }
 
 
-function renderBingo() {
-  var grid = document.getElementById('bingo-grid');
-  if (!grid) return;
-  var postedOnce = TEAM.filter(function(t){ return t.p > 0; }).length;
-  var html = '';
-  // 5x5 = 25 cells, all identical locked placeholders
-  for (var i = 0; i < 25; i++) {
-    html += '<div class="bingo-cell"><span class="bingo-cell-lock">🔒</span></div>';
-  }
-  grid.innerHTML = html;
-  var statusEl = document.getElementById('bingo-unlock-status');
-  if (statusEl) {
-    statusEl.textContent = postedOnce + ' of ' + TEAM.length + ' have posted so far.';
-  }
-}
+// (duplicate renderBingo removed — using the full interactive version defined above)
 
-loadMe(); renderLB(); renderAvatars(); renderBingo(); renderBingo();
+loadMe(); renderLB(); renderAvatars(); renderBingo();
 
 // Resize world canvas properly
 function resizeWorld() {

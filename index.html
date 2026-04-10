@@ -1520,6 +1520,22 @@ var bingoState = JSON.parse(localStorage.getItem('pwi_bingo') || '{}');
 
 // ── POST LOGGING ─────────────────────────────────────────────────────────────
 var loggedPosts = [];
+// Returns true if a YYYY-MM-DD date string falls in the current Mon-Sun week.
+// Used to set "posted this week" per person — drives green cards, weather, and bingo unlock.
+function isThisWeek(dateStr) {
+  if (!dateStr) return false;
+  var d = new Date(dateStr);
+  var now = new Date();
+  var day = now.getDay() || 7; // treat Sunday as 7 so Mon = 1
+  var startOfWeek = new Date(now);
+  startOfWeek.setDate(now.getDate() - day + 1);
+  startOfWeek.setHours(0, 0, 0, 0);
+  var endOfWeek = new Date(startOfWeek);
+  endOfWeek.setDate(startOfWeek.getDate() + 6);
+  endOfWeek.setHours(23, 59, 59, 999);
+  return d >= startOfWeek && d <= endOfWeek;
+}
+
 async function loadPostsFromNotion() {
   try {
     const res = await fetch('https://post-with-intent-proxy.sara-690.workers.dev/api/leaderboard');
@@ -1527,7 +1543,12 @@ async function loadPostsFromNotion() {
     loggedPosts = Object.entries(data.posts).flatMap(([person, posts]) =>
       posts.map(p => ({ name: person, url: p.url, date: p.date }))
     );
-    renderLB(); renderAvatars();
+    // Mark each person as "posted this week" if they have any post dated in the current week.
+    // This drives the green avatar cards, the weather scene, and the bingo board unlock.
+    TEAM.forEach(function(t) {
+      t.posted = (data.posts[t.n] || []).some(function(p) { return isThisWeek(p.date); });
+    });
+    renderLB(); renderAvatars(); renderBingo();
   } catch(e) { console.error('Failed to load posts', e); }
 }
 loadPostsFromNotion();

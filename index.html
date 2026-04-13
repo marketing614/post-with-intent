@@ -820,6 +820,7 @@ select.dqi { display: none; }  /* hidden — replaced by custom dropdown */
     <div id="log-who-check" style="margin-bottom:14px;padding:10px 14px;background:var(--bg);border:2px solid var(--border2);font-size:13px;color:var(--cream2)">
       Logging as: <span id="log-who-name" style="color:var(--gold);font-weight:700">nobody — pick your name first</span>
     </div>
+    <div id="log-bingo-hint" style="display:none;margin-bottom:12px;padding:8px 12px;background:rgba(244,196,48,0.1);border:2px solid var(--gold);font-size:12px;font-weight:700;color:var(--gold);line-height:1.4"></div>
     <div style="margin-bottom:10px">
       <div class="dql" style="margin-bottom:6px">LINKEDIN POST URL</div>
       <input id="log-url-input" type="url" placeholder="https://www.linkedin.com/posts/..." style="font-family:inherit;font-size:13px;color:var(--cream);background:var(--bg);border:2px solid var(--border2);padding:10px 12px;width:100%;box-sizing:border-box;outline:none">
@@ -1554,11 +1555,21 @@ async function loadPostsFromNotion() {
 }
 loadPostsFromNotion();
    
-function openLogPost() {
+function openLogPost(bingoHint) {
   var nameEl = document.getElementById('log-who-name');
   if (nameEl) nameEl.textContent = me ? me.n : 'nobody — pick your name first';
   document.getElementById('log-url-input').value = '';
   document.getElementById('log-result').style.display = 'none';
+  var hintEl = document.getElementById('log-bingo-hint');
+  if (hintEl) {
+    if (bingoHint) {
+      hintEl.textContent = 'Logging for bingo square: ' + bingoHint;
+      hintEl.style.display = 'block';
+    } else {
+      hintEl.style.display = 'none';
+      activeBingoSquare = null;
+    }
+  }
   renderLogHistory();
   openM('log-modal');
 }
@@ -1592,7 +1603,7 @@ function renderBingo() {
       cell.innerHTML = '<span style="display:block;font-size:14px;margin-bottom:2px">' + sq.emoji + '</span><span>' + sq.label + '</span>';
     }
     if (sq.id !== 'FREE') {
-      cell.onclick = function() { toggleBingoCell(sq.id, cell); };
+      cell.onclick = function() { toggleBingoCell(sq.id); };
     }
     grid.appendChild(cell);
   });
@@ -1600,26 +1611,33 @@ function renderBingo() {
   checkBingoWin();
 }
 
-function toggleBingoCell(id, cell) {
-  // Only works when unlocked
+// Tracks which bingo square triggered the log post modal
+var activeBingoSquare = null;
+
+function toggleBingoCell(id) {
+  // Only works when board is unlocked
   var overlay = document.getElementById('bingo-lock-overlay');
   if (overlay && overlay.style.display !== 'none') return;
-  bingoState[id] = !bingoState[id];
-  localStorage.setItem('pwi_bingo', JSON.stringify(bingoState));
-  cell.classList.toggle('done', bingoState[id]);
-  checkBingoWin();
+  // Already claimed — don't allow re-logging
+  if (bingoState[id]) { showToast('ALREADY CLAIMED ✓'); return; }
+  // Open the log post modal with this square as context
+  var sq = BINGO_SQUARES.find(function(s){ return s.id === id; });
+  activeBingoSquare = id;
+  openLogPost(sq ? sq.emoji + ' ' + sq.label : '');
 }
 
 function checkBingoUnlock() {
   var overlay = document.getElementById('bingo-lock-overlay');
   if (!overlay) return;
-  var allPosted = TEAM.every(function(t) { return t.posted; });
+  // Use all-time post count (t.p > 0), not "posted this week" —
+  // the board unlocks once everyone has made their first post ever.
+  var allPosted = TEAM.every(function(t) { return t.p > 0; });
   var statusEl = document.getElementById('bingo-unlock-status');
   if (allPosted) {
     overlay.style.display = 'none';
   } else {
     overlay.style.display = 'flex';
-    var posted = TEAM.filter(function(t){ return t.posted; }).length;
+    var posted = TEAM.filter(function(t){ return t.p > 0; }).length;
     if (statusEl) statusEl.textContent = posted + ' of ' + TEAM.length + ' have posted';
   }
 }
@@ -2299,11 +2317,21 @@ function showToast(msg){
 
 // ── POST LOGGING ─────────────────────────────────────────────────────────────
 
-function openLogPost() {
+function openLogPost(bingoHint) {
   var nameEl = document.getElementById('log-who-name');
   if (nameEl) nameEl.textContent = me ? me.n : 'nobody — pick your name first';
   document.getElementById('log-url-input').value = '';
   document.getElementById('log-result').style.display = 'none';
+  var hintEl = document.getElementById('log-bingo-hint');
+  if (hintEl) {
+    if (bingoHint) {
+      hintEl.textContent = 'Logging for bingo square: ' + bingoHint;
+      hintEl.style.display = 'block';
+    } else {
+      hintEl.style.display = 'none';
+      activeBingoSquare = null;
+    }
+  }
   renderLogHistory();
   openM('log-modal');
 }
@@ -2339,6 +2367,15 @@ function submitLogPost() {
   document.getElementById('log-url-input').value = '';
   renderLogHistory();
   showToast('+1 POINT LOGGED');
+
+  // If this log came from a bingo square, mark that square as claimed
+  if (activeBingoSquare) {
+    bingoState[activeBingoSquare] = true;
+    localStorage.setItem('pwi_bingo', JSON.stringify(bingoState));
+    activeBingoSquare = null;
+    renderBingo();
+    checkBingoWin();
+  }
 
   // Save to Notion via Cloudflare so the point persists after refresh
   var today = new Date().toISOString().split('T')[0];

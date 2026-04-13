@@ -182,16 +182,6 @@ canvas#world { display: block; width: 100%; height: 100%; image-rendering: pixel
 /* ── MAIN GRID ── */
 .main-grid { display: grid; grid-template-columns: 1fr 260px; gap: 16px; align-items: start; }
 
-/* ── WRITE A POST ── */
-.write-card { padding: 22px 22px; margin-bottom: 16px; }
-.write-heading {
-  font-family: 'Inter', sans-serif;
-  font-size: 18px; font-weight: 800; color: var(--gold);
-  text-shadow: 1px 1px 0 #7a5a00;
-  margin-bottom: 10px; letter-spacing: -0.01em;
-}
-.write-sub { font-size: 16px; color: var(--cream2); margin-bottom: 20px; line-height: 1.65; }
-
 .px-btn {
   font-family: 'Inter', sans-serif;
   font-size: 15px; font-weight: 800; color: var(--bg);
@@ -318,113 +308,6 @@ canvas#world { display: block; width: 100%; height: 100%; image-rendering: pixel
   border: 1px solid var(--border2);
 }
 
-/* ── DRAWER ── */
-.drawer-bg {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.7);
-  z-index: 300; opacity: 0; pointer-events: none; transition: opacity 0.2s;
-}
-.drawer-bg.open { opacity: 1; pointer-events: all; }
-.drawer {
-  position: fixed; top: 0; right: 0; bottom: 0; width: 520px; max-width: 96vw;
-  background: var(--panel); border-left: 3px solid var(--border);
-  box-shadow: -4px 0 0 var(--border2);
-  z-index: 301; transform: translateX(100%);
-  transition: transform 0.25s cubic-bezier(0.22,1,0.36,1);
-  display: flex; flex-direction: column; overflow: hidden;
-}
-.drawer.open { transform: translateX(0); }
-.dr-head {
-  background: var(--panel2); border-bottom: 3px solid var(--border);
-  padding: 18px 22px; flex-shrink: 0;
-  display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
-}
-.dr-title {
-  font-family: 'Inter', sans-serif;
-  font-size: 20px; font-weight: 800; color: var(--gold);
-  text-shadow: 1px 1px 0 #7a5a00;
-  margin-bottom: 4px; letter-spacing: -0.02em;
-}
-.dr-sub { font-size: 15px; color: var(--cream2); }
-.dr-close {
-  font-family: 'Inter', sans-serif;
-  font-size: 13px; font-weight: 700; color: var(--cream2);
-  background: var(--panel); border: 2px solid var(--border);
-  padding: 8px 14px; cursor: pointer;
-  box-shadow: 2px 2px 0 var(--border2); flex-shrink: 0;
-}
-.dr-close:hover { color: var(--cream); }
-.dr-body { padding: 22px 22px; flex: 1; overflow-y: auto; }
-.dr-note {
-  font-size: 14px; color: var(--cream2);
-  line-height: 1.7; margin-bottom: 22px;
-  border-left: 3px solid var(--border); padding-left: 12px;
-}
-.dql {
-  font-family: 'Inter', sans-serif;
-  font-size: 11px; font-weight: 700; color: var(--cream2);
-  margin-bottom: 8px; letter-spacing: 0.1em; text-transform: uppercase;
-}
-.dqi {
-  width: 100%;
-  background: var(--bg); border: 2px solid var(--border);
-  color: var(--cream); font-family: 'Inter', sans-serif;
-  font-size: 14px; padding: 12px 14px; resize: none; outline: none;
-  margin-bottom: 18px;
-  box-shadow: inset 2px 2px 0 rgba(0,0,0,0.3);
-  transition: border-color 0.15s;
-}
-.dqi:focus { border-color: var(--gold); }
-.dqi::placeholder { color: var(--grey); }
-select.dqi { display: none; }  /* hidden — replaced by custom dropdown */
-.select-wrap { position: relative; margin-bottom: 18px; }
-.select-wrap .dqi { margin-bottom: 0; }
-.select-arrow {
-  position: absolute; right: 12px; top: 50%;
-  transform: translateY(-50%); pointer-events: none;
-  font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 700; color: var(--gold);
-}
-.load-l {
-  display: none; font-family: 'Inter', sans-serif;
-  font-size: 15px; font-weight: 700; color: var(--green); margin-bottom: 14px;
-  letter-spacing: 0.04em;
-}
-.load-l.show { display: block; }
-.load-l::after { content: ''; animation: dots 1s step-end infinite; }
-@keyframes dots { 0%{content:' ·'} 33%{content:'..'} 66%{content:'...'} 100%{content:'.'} }
-.draft {
-  background: var(--bg); border: 2px solid var(--border);
-  padding: 14px; margin-bottom: 12px; display: none;
-}
-.draft.show { display: block; }
-.draft-lbl {
-  font-family: 'Inter', sans-serif;
-  font-size: 11px; font-weight: 700; color: var(--purple);
-  margin-bottom: 10px; letter-spacing: 0.06em; text-transform: uppercase;
-}
-.draft-txt {
-  font-size: 14px; color: var(--cream); line-height: 1.85;
-  white-space: pre-wrap;
-}
-.draft-actions { display: flex; gap: 8px; margin-top: 10px; }
-.sm-btn {
-  font-family: 'Inter', sans-serif;
-  font-size: 11px; font-weight: 600; padding: 7px 12px; cursor: pointer; border: none;
-  background: var(--panel2); border: 2px solid var(--border);
-  color: var(--cream2); box-shadow: 1px 1px 0 var(--border2);
-}
-.sm-btn:hover { color: var(--cream); }
-.sm-btn:active { transform: translate(1px,1px); box-shadow: none; }
-.regen-btn {
-  display: none; width: 100%;
-  font-family: 'Inter', sans-serif;
-  font-size: 14px; font-weight: 600; color: var(--cream2);
-  background: transparent; border: 2px solid var(--border);
-  padding: 13px; cursor: pointer; margin-bottom: 12px;
-  letter-spacing: 0.01em;
-}
-.regen-btn.show { display: block; }
-.regen-btn:hover { border-color: var(--purple); color: var(--cream); }
-
 /* ── WHO MODAL ── */
 .modal-bg {
   position: fixed; inset: 0; background: rgba(0,0,0,0.8);
@@ -490,114 +373,6 @@ select.dqi { display: none; }  /* hidden — replaced by custom dropdown */
   text-transform: uppercase; letter-spacing: 0.04em;
 }
 
-
-
-/* ── CUSTOM PIXEL DROPDOWN ── */
-.px-select { position: relative; margin-bottom: 18px; user-select: none; }
-.px-select-btn {
-  width: 100%; display: flex; align-items: center; justify-content: space-between;
-  background: var(--bg); border: 2px solid var(--border);
-  color: var(--cream); font-family: 'Inter', sans-serif;
-  font-size: 15px; padding: 13px 14px; cursor: pointer;
-  box-shadow: inset 2px 2px 0 rgba(0,0,0,0.3);
-  transition: border-color 0.15s;
-}
-.px-select-btn:focus { outline: none; border-color: var(--gold); }
-.px-select-btn.open { border-color: var(--gold); }
-.px-select-arrow {
-  font-family: 'Inter', sans-serif;
-  font-size: 14px; font-weight: 700; color: var(--gold); flex-shrink: 0; margin-left: 8px;
-  transition: transform 0.15s;
-}
-.px-select-btn.open .px-select-arrow { transform: scaleY(-1); }
-.px-select-list {
-  display: none; position: absolute; top: 100%; left: 0; right: 0; z-index: 50;
-  background: var(--panel2); border: 2px solid var(--gold);
-  border-top: none;
-  box-shadow: 4px 4px 0 var(--border2);
-  max-height: 260px; overflow-y: auto;
-}
-.px-select-list.open { display: block; }
-.px-select-opt {
-  padding: 12px 16px; font-family: 'Inter', sans-serif;
-  font-size: 14px; color: var(--cream2); cursor: pointer;
-  border-bottom: 1px solid var(--border2);
-  transition: background 0.08s, color 0.08s;
-  display: flex; align-items: center; gap: 10px;
-}
-.px-select-opt:last-child { border-bottom: none; }
-.px-select-opt:hover { background: var(--panel); color: var(--cream); }
-.px-select-opt.selected { color: var(--gold); background: rgba(244,196,48,0.08); }
-.px-select-opt-ico { font-size: 14px; flex-shrink: 0; }
-.px-select-placeholder { color: var(--grey); }
-
-
-/* ── BUZZFEED QUIZ ── */
-.quiz-toggle {
-  font-family: 'Inter', sans-serif;
-  font-size: 13px; font-weight: 700; color: var(--blue);
-  background: transparent; border: 2px solid var(--blue);
-  padding: 10px 16px; cursor: pointer;
-  display: flex; align-items: center; gap: 8px;
-  width: 100%; margin-bottom: 14px; text-align: left;
-}
-.quiz-toggle:hover { background: rgba(91,141,217,0.1); }
-.quiz-panel { display: none; margin-bottom: 18px; }
-.quiz-panel.open { display: block; }
-.quiz-step { display: none; }
-.quiz-step.active { display: block; }
-.quiz-q {
-  font-family: 'Inter', sans-serif;
-  font-size: 14px; font-weight: 700; color: var(--cream);
-  margin-bottom: 12px; line-height: 1.5;
-}
-.quiz-counter {
-  font-size: 11px; font-weight: 600; color: var(--grey);
-  text-transform: uppercase; letter-spacing: 0.08em;
-  margin-bottom: 8px;
-}
-.quiz-opts { display: flex; flex-direction: column; gap: 8px; }
-.quiz-opt {
-  font-family: 'Inter', sans-serif;
-  font-size: 13px; font-weight: 600;
-  padding: 11px 14px; cursor: pointer;
-  background: var(--bg); border: 2px solid var(--border2);
-  color: var(--cream2); text-align: left;
-  transition: all 0.1s;
-}
-.quiz-opt:hover { border-color: var(--blue); color: var(--cream); }
-.quiz-opt.selected { border-color: var(--gold); color: var(--gold); background: rgba(244,196,48,0.08); }
-.quiz-result {
-  display: none;
-  background: var(--bg); border: 2px solid var(--green);
-  padding: 16px; margin-top: 4px;
-}
-.quiz-result.show { display: block; }
-.quiz-result-label {
-  font-size: 11px; font-weight: 700; color: var(--green);
-  text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px;
-}
-.quiz-result-angle {
-  font-size: 15px; font-weight: 700; color: var(--cream);
-  margin-bottom: 8px; line-height: 1.4;
-}
-.quiz-result-prompt {
-  font-size: 13px; color: var(--cream2); line-height: 1.65;
-  margin-bottom: 12px;
-}
-.quiz-use-btn {
-  font-family: 'Inter', sans-serif;
-  font-size: 13px; font-weight: 700;
-  background: var(--green); color: var(--bg);
-  border: none; padding: 10px 18px; cursor: pointer;
-  box-shadow: 0 3px 0 #2a7a45;
-}
-.quiz-restart {
-  font-family: 'Inter', sans-serif;
-  font-size: 12px; font-weight: 600; color: var(--grey);
-  background: transparent; border: none; cursor: pointer;
-  margin-left: 12px; text-decoration: underline;
-}
 
 
 /* ── BINGO BOARD ── */
@@ -718,6 +493,7 @@ select.dqi { display: none; }  /* hidden — replaced by custom dropdown */
       <div class="live-dot-wrap"><div class="live-dot"></div>LIVE</div>
       <button class="user-btn" id="u-btn" onclick="openWho()">▶ ADD YOUR NAME</button>
       <button class="user-btn" onclick="openRules()" style="color:var(--cream2)">RULES &amp; INFO</button>
+      <button class="user-btn" onclick="openM('voice-modal')" style="color:var(--blue)">✦ SET UP YOUR VOICE</button>
       <button class="user-btn" onclick="loadPostsFromNotion()" style="color:var(--cream2)" title="Refresh scores from Notion">↻ REFRESH</button>
     <button class="user-btn" onclick="openLogPost()" style="background:var(--green);color:var(--bg);font-weight:800;border:none;padding:6px 14px;cursor:pointer">+ LOG POST</button>
     </div>
@@ -770,12 +546,15 @@ select.dqi { display: none; }  /* hidden — replaced by custom dropdown */
     <!-- LEFT COL -->
     <div>
 
-      <!-- WRITE A POST -->
-      <div class="write-card panel" style="margin-bottom:16px">
-        <div class="write-heading">✏ WRITE A POST WITH AI</div>
-        <div class="write-sub">Answer 2 quick questions. Get 2 draft posts in your voice. Edit and publish.</div>
-        <button class="px-btn gold" onclick="openDrawer()">▶ START WRITING</button>
+      <!-- MWI LINKEDIN FEED — placeholder, wire up via Make automation when ready -->
+      <!--
+      <div class="panel" style="padding:18px 20px;margin-bottom:16px">
+        <div class="section-heading">LATEST FROM MWI</div>
+        <div id="mwi-feed">
+          [Posts pulled from Make automation — show last 3-5, card per post: first line + LinkedIn URL]
+        </div>
       </div>
+      -->
 
       <!-- WHO POSTED THIS WEEK -->
       <div class="team-card panel" style="margin-bottom:16px">
@@ -825,6 +604,10 @@ select.dqi { display: none; }  /* hidden — replaced by custom dropdown */
       <div class="dql" style="margin-bottom:6px">LINKEDIN POST URL</div>
       <input id="log-url-input" type="url" placeholder="https://www.linkedin.com/posts/..." style="font-family:inherit;font-size:13px;color:var(--cream);background:var(--bg);border:2px solid var(--border2);padding:10px 12px;width:100%;box-sizing:border-box;outline:none">
     </div>
+    <div style="margin-bottom:10px">
+      <div class="dql" style="margin-bottom:4px">ADD DESCRIPTION <span style="font-weight:500;color:var(--grey);font-size:11px;text-transform:none;letter-spacing:0">(optional — helps you remember what the post was about)</span></div>
+      <input id="log-title-input" type="text" placeholder="e.g. I had a call last week that changed how I think about..." style="font-family:inherit;font-size:13px;color:var(--cream);background:var(--bg);border:2px solid var(--border2);padding:10px 12px;width:100%;box-sizing:border-box;outline:none;margin-bottom:10px">
+    </div>
     <button onclick="submitLogPost()" style="font-family:inherit;font-size:14px;font-weight:800;background:var(--green);color:var(--bg);border:none;padding:12px 20px;cursor:pointer;width:100%;box-shadow:0 3px 0 #2a7a45;margin-bottom:10px">CLAIM MY POINT &#9658;</button>
     <div id="log-result" style="display:none;padding:10px 14px;font-size:13px;line-height:1.6;border:2px solid var(--green);color:var(--green)"></div>
     <div id="log-history" style="margin-top:14px"></div>
@@ -861,95 +644,69 @@ select.dqi { display: none; }  /* hidden — replaced by custom dropdown */
   </div>
 </div>
 
-<!-- DRAWER -->
-<div class="drawer-bg" id="dbg" onclick="closeDrawer()"></div>
-<div class="drawer" id="drawer">
-  <div class="dr-head">
-    <div><div class="dr-title">WRITE A POST</div><div class="dr-sub">2 questions → 2 drafts in your voice</div></div>
-    <button class="dr-close" onclick="closeDrawer()">✕ CLOSE</button>
-  </div>
-  <div class="dr-body">
-    <p class="dr-note">The messier and more specific your notes, the better the draft. Edit before you post so it sounds like you.</p>
-    <div id="api-notice" style="display:none" style="display:none;background:rgba(224,92,92,0.12);border:2px solid var(--coral);padding:10px 14px;margin-bottom:18px;font-size:13px;color:var(--coral);line-height:1.6">
-      ⚠ API key not set. To enable AI drafts, open the HTML file, find Please ask Sara to sort the API key.
+<!-- VOICE SETUP MODAL -->
+<div class="modal-bg" id="voice-modal" onclick="bgC(event,'voice-modal')">
+  <div class="rules-box" style="max-width:560px">
+    <div class="rules-hrow">
+      <div>
+        <div class="rules-title" style="font-size:20px">FIND YOUR VOICE ON LINKEDIN</div>
+        <div class="rules-sub">A short interview that figures out how you actually communicate — and turns it into your personal posting style.</div>
+      </div>
+      <button class="px-x" onclick="closeM('voice-modal')">&#10005;</button>
     </div>
-    <!-- BUZZFEED QUIZ -->
-    <button class="quiz-toggle" id="quiz-toggle" onclick="toggleQuiz()">
-      ✦ Not sure what to post? Find your angle in 3 questions
-    </button>
-    <div class="quiz-panel" id="quiz-panel">
-      <!-- Step 1 -->
-      <div class="quiz-step active" id="quiz-step-1">
-        <div class="quiz-counter">Question 1 of 3</div>
-        <div class="quiz-q">Something happened this week. What kind of thing was it?</div>
-        <div class="quiz-opts">
-          <div class="quiz-opt" onclick="quizPick(1,'call')">💬 Something from a client call or meeting</div>
-          <div class="quiz-opt" onclick="quizPick(1,'data')">📊 A number or result that surprised me</div>
-          <div class="quiz-opt" onclick="quizPick(1,'opinion')">🔥 I have a strong opinion about how ecomm teams do something</div>
-          <div class="quiz-opt" onclick="quizPick(1,'nothing')">😶 Genuinely nothing — I just want to post something useful</div>
-        </div>
-      </div>
-      <!-- Step 2 -->
-      <div class="quiz-step" id="quiz-step-2">
-        <div class="quiz-counter">Question 2 of 3</div>
-        <div class="quiz-q" id="quiz-q2">Loading...</div>
-        <div class="quiz-opts" id="quiz-opts-2"></div>
-      </div>
-      <!-- Step 3 -->
-      <div class="quiz-step" id="quiz-step-3">
-        <div class="quiz-counter">Question 3 of 3</div>
-        <div class="quiz-q" id="quiz-q3">Loading...</div>
-        <div class="quiz-opts" id="quiz-opts-3"></div>
-      </div>
-      <!-- Result -->
-      <div class="quiz-result" id="quiz-result">
-        <div class="quiz-result-label">Your angle</div>
-        <div class="quiz-result-angle" id="quiz-result-angle"></div>
-        <div class="quiz-result-prompt" id="quiz-result-prompt"></div>
-        <button class="quiz-use-btn" onclick="useQuizResult()">USE THIS ANGLE ▶</button>
-        <button class="quiz-restart" onclick="restartQuiz()">Start over</button>
-        <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border2)"><div style="font-size:11px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px">Need real material from a call?</div><p style="font-size:12px;color:var(--cream2);line-height:1.6;margin-bottom:8px">Copy this into Granola chat. Paste the answer into your notes above.</p><button onclick="copyGranolaQ()" style="font-family:inherit;font-size:12px;font-weight:700;color:var(--cream);background:var(--bg);border:2px solid var(--border2);padding:8px 14px;cursor:pointer;width:100%;text-align:left">Copy question for Granola</button><div id="granola-q-preview" style="display:none;margin-top:8px;padding:8px;border:1px solid var(--border2);font-size:11px;color:var(--grey);line-height:1.6"></div></div>
+
+    <div style="margin-bottom:20px">
+      <div style="font-size:12px;font-weight:700;color:var(--cream2);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px">HOW IT WORKS</div>
+      <div style="font-size:14px;color:var(--cream);line-height:1.75">
+        <div style="display:flex;gap:10px;margin-bottom:8px"><span style="color:var(--gold);font-weight:800;flex-shrink:0">1.</span> Copy the script below</div>
+        <div style="display:flex;gap:10px;margin-bottom:8px"><span style="color:var(--gold);font-weight:800;flex-shrink:0">2.</span> Open a new Cowork chat and paste it in</div>
+        <div style="display:flex;gap:10px;margin-bottom:8px"><span style="color:var(--gold);font-weight:800;flex-shrink:0">3.</span> Run the interview — it takes about 10 minutes</div>
+        <div style="display:flex;gap:10px"><span style="color:var(--gold);font-weight:800;flex-shrink:0">4.</span> Save the voice profile it gives you. That's what powers your posts.</div>
       </div>
     </div>
 
-    <input type="hidden" id="inspo-selected" value="">
-    <div class="dql">WHICH TOPIC?</div>
-    <div class="px-select" id="topic-select">
-      <button type="button" class="px-select-btn" id="topic-btn" onclick="toggleSelect()" aria-haspopup="listbox" aria-expanded="false">
-        <span id="topic-display" class="px-select-placeholder">Select a topic...</span>
-        <span class="px-select-arrow">▼</span>
-      </button>
-      <div class="px-select-list" id="topic-list" role="listbox">
-        <div class="px-select-opt" onclick="pickTopic('','Select a topic...','')" data-value=""><span class="px-select-opt-ico">—</span>No preference</div>
-        <div class="px-select-opt" onclick="pickTopic('Client story','Client story','💼')" data-value="Client story"><span class="px-select-opt-ico">💼</span>Client story</div>
-        <div class="px-select-opt" onclick="pickTopic('Hot take on ecomm','Hot take on ecomm','🔥')" data-value="Hot take on ecomm"><span class="px-select-opt-ico">🔥</span>Hot take on ecomm</div>
-        <div class="px-select-opt" onclick="pickTopic('Intent gap explainer','Intent gap explainer','🎯')" data-value="Intent gap explainer"><span class="px-select-opt-ico">🎯</span>Intent gap explainer</div>
-        <div class="px-select-opt" onclick="pickTopic('Something you learned','Something you learned','💡')" data-value="Something you learned"><span class="px-select-opt-ico">💡</span>Something you learned</div>
-        <div class="px-select-opt" onclick="pickTopic('A win this month','A win this month','🏆')" data-value="A win this month"><span class="px-select-opt-ico">🏆</span>A win this month</div>
-        <div class="px-select-opt" onclick="pickTopic('Behind a data point','Behind a data point','📊')" data-value="Behind a data point"><span class="px-select-opt-ico">📊</span>Behind a data point</div>
-        <div class="px-select-opt" onclick="pickTopic('Tool or workflow tip','Tool or workflow tip','⚡')" data-value="Tool or workflow tip"><span class="px-select-opt-ico">⚡</span>Tool or workflow tip</div>
-        <div class="px-select-opt" onclick="pickTopic('Unpopular opinion','Unpopular opinion','👀')" data-value="Unpopular opinion"><span class="px-select-opt-ico">👀</span>Unpopular opinion</div>
-        <div class="px-select-opt" onclick="pickTopic('Personal career story','Personal career story','🌱')" data-value="Personal career story"><span class="px-select-opt-ico">🌱</span>Personal career story</div>
-        <div class="px-select-opt" onclick="pickTopic('The intent gap in real life','The intent gap in real life','🔍')" data-value="The intent gap in real life"><span class="px-select-opt-ico">🔍</span>The intent gap in real life</div>
+    <div style="margin-bottom:20px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div style="font-size:12px;font-weight:700;color:var(--cream2);text-transform:uppercase;letter-spacing:0.08em">THE SCRIPT</div>
+        <button onclick="copyVoiceScript()" style="font-family:inherit;font-size:12px;font-weight:700;color:var(--bg);background:var(--gold);border:none;padding:6px 14px;cursor:pointer;box-shadow:0 2px 0 #9a7a00" id="voice-copy-btn">COPY SCRIPT</button>
       </div>
-      <!-- hidden input for JS to read value -->
-      <input type="hidden" id="d-sq" value="">
+      <div style="background:var(--bg);border:2px solid var(--border2);padding:14px 16px;max-height:220px;overflow-y:auto;font-size:12px;color:var(--cream2);line-height:1.8;white-space:pre-wrap;font-family:monospace" id="voice-script-preview">You're running a LinkedIn identity interview with me.
+The goal is to help me figure out my personal voice and what I actually stand for on LinkedIn — not what the company wants, but what's genuinely mine. This will shape the topics I post about and how I write.
+Run this as a real conversation. One question at a time. Wait for my answer. React to what I say — if something is interesting, go deeper. If something is vague, push me to be more specific. Keep it human, not like a form.
+We have four short phases. At the end, give me:
+1. A voice profile — 3-4 sentences describing how I actually communicate, based on what I said
+2. 3-4 personal posting pillars — topics that are genuinely mine, each with a one-line explanation of why it works for me and what kind of post it leads to (a client win, a personal take, a timely observation, a story)
+3. One post prompt — something specific I said that could become a real post this week, written as a prompt I can work from right now
+---
+Start here, in your own words:
+"Before we get into work — who are you outside your job? What do you actually spend time on, follow obsessively, or care about that has nothing to do with your role?"
+Then move through these phases naturally. Don't read the questions out. Adapt based on what I say.
+PHASE 1 — Who you are (not your job title)
+- What do you consume? Sport, podcasts, shows, games, creators, communities
+- How do you communicate with people — are you the one who tells the long story, drops the one-liner, or asks all the questions?
+- What could you talk about for an hour without preparing anything?
+- What do you believe that most people in your industry would push back on?
+PHASE 2 — Your work, honestly
+- What do you actually do day to day — and what part of it shows up in your head outside of work hours?
+- What's something that worked recently that you're quietly proud of?
+- What do you wish more people understood about what you do or the space you work in?
+- What would make you cringe about your own post — what's the version of you on LinkedIn you'd be embarrassed by?
+PHASE 3 — Your LinkedIn why
+- Who are you actually trying to reach — or who would you want to stumble across your posts?
+- If someone read 10 of your posts, what would you want them to think about you?
+- What's actually stopping you from posting more — be honest, not polished
+PHASE 4 — This week
+- What's one thing that happened at work this week — a conversation, a result, something that surprised you, anything
+- What's something you noticed recently — inside or outside work — that made you think "that's interesting"
+---
+Once you have my answers, synthesise and give me my voice profile, pillars, and one ready-to-use post prompt. Be specific. Reference what I actually said. No generic LinkedIn advice.</div>
     </div>
-    <div class="dql">WHAT ACTUALLY HAPPENED?</div>
-    <textarea class="dqi" id="d-q1" rows="3" placeholder="A client call moment, something you noticed, a pattern you spotted. Be specific and messy."></textarea>
-    <div class="dql">ANY QUOTES, NUMBERS, OR NOTES?</div>
-    <textarea class="dqi" id="d-q2" rows="2" placeholder="e.g. '40% of buyers came back before purchasing'"></textarea>
-    <div class="load-l" id="d-load">Writing your drafts</div>
-    <div class="draft" id="da"><div class="draft-lbl">// DRAFT A — STORY-LED</div><div class="draft-txt" id="da-t"></div><div class="draft-actions"><button class="sm-btn" onclick="cp('a')">COPY</button></div></div>
-    <div class="draft" id="db"><div class="draft-lbl">// DRAFT B — INSIGHT-LED</div><div class="draft-txt" id="db-t"></div><div class="draft-actions"><button class="sm-btn" onclick="cp('b')">COPY</button></div></div>
-    <div id="visual-hint" style="display:none;padding:12px 14px;background:var(--bg);border:2px solid var(--border2);margin-bottom:12px;font-size:13px;color:var(--cream2);line-height:1.6">
-      <span style="font-weight:700;color:var(--cream)">📸 Visual idea:</span> <span id="visual-hint-text"></span>
-      <span style="display:block;margin-top:6px"><a href="#" id="drive-link-a" target="_blank" style="color:var(--blue);text-decoration:none;font-weight:600">Browse MWI event photos →</a></span>
-    </div>
-    <button class="regen-btn" id="regen-btn" onclick="generate()">↺ NAH, GIVE ME 2 OTHER ONES</button>
-    <button class="clear-btn" id="clear-btn" onclick="clearDrawer()">✕ CLEAR AND START OVER</button>
-    <button class="px-btn gold" id="gen-btn" onclick="generate()" style="width:100%">▶ GENERATE 2 DRAFTS</button>
 
+    <div style="border-top:2px solid var(--border2);padding-top:16px">
+      <div style="font-size:12px;font-weight:700;color:var(--cream2);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px">NEXT: POST-WRITING SKILL</div>
+      <div style="font-size:13px;color:var(--cream2);line-height:1.65;margin-bottom:12px">Once you've run the interview and saved your voice profile, you'll use the post-writing skill to write every post. It reads your voice automatically.</div>
+      <button disabled style="font-family:inherit;font-size:13px;font-weight:700;color:var(--grey);background:var(--panel2);border:2px solid var(--border2);padding:10px 18px;cursor:not-allowed;opacity:0.5;width:100%">⬇ DOWNLOAD POST-WRITING SKILL — COMING SOON</button>
+    </div>
   </div>
 </div>
 
@@ -1543,7 +1300,7 @@ async function loadPostsFromNotion() {
     const res = await fetch('https://post-with-intent-proxy.sara-690.workers.dev/api/leaderboard');
     const data = await res.json();
     loggedPosts = Object.entries(data.posts).flatMap(([person, posts]) =>
-      posts.map(p => ({ name: person, url: p.url, date: p.date }))
+      posts.map(p => ({ name: person, url: p.url, date: p.date, title: p.title || '' }))
     );
     // Mark each person as "posted this week" if they have any post dated in the current week.
     // This drives the green avatar cards, the weather scene, and the bingo board unlock.
@@ -1559,6 +1316,7 @@ function openLogPost(bingoHint) {
   var nameEl = document.getElementById('log-who-name');
   if (nameEl) nameEl.textContent = me ? me.n : 'nobody — pick your name first';
   document.getElementById('log-url-input').value = '';
+  document.getElementById('log-title-input').value = '';
   document.getElementById('log-result').style.display = 'none';
   var hintEl = document.getElementById('log-bingo-hint');
   if (hintEl) {
@@ -1577,7 +1335,7 @@ function openLogPost(bingoHint) {
 function renderLogHistory() {
   var el = document.getElementById('log-history');
   if (!el || !loggedPosts.length) { if(el) el.innerHTML = ''; return; }
-  var html = '<div style="font-size:10px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">Posts logged this session</div>';
+  var html = '<div style="font-size:10px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">Recent posts</div>';
   loggedPosts.slice(-5).reverse().forEach(function(p) {
     html += '<div style="display:flex;gap:8px;align-items:flex-start;padding:7px 0;border-bottom:1px solid var(--border2);font-size:12px">'
       + '<span style="color:var(--gold);font-weight:700;flex-shrink:0">' + p.name + '</span>'
@@ -1739,9 +1497,11 @@ function openPersonDrawer(name) {
     var sorted = posts.slice().reverse();
     var html = '';
     sorted.forEach(function(p, i) {
+      var label = p.title ? p.title : 'Post ' + (sorted.length - i);
       html += '<div style="padding:10px 0;border-bottom:1px solid var(--border2)">'
         + '<div style="font-size:10px;color:var(--grey);margin-bottom:4px">'+p.date+'</div>'
-        + '<a href="'+p.url+'" target="_blank" style="font-size:13px;color:var(--blue);text-decoration:none;word-break:break-all">Post '+(sorted.length - i)+' &#8599;</a>'
+        + '<a href="'+p.url+'" target="_blank" style="font-size:13px;color:var(--blue);text-decoration:none;display:block;line-height:1.45">'
+        + label + ' &#8599;</a>'
         + '</div>';
     });
     postsEl.innerHTML = html;
@@ -1801,17 +1561,19 @@ function loadMe() {
   else{ setTimeout(openWho, 600); }
 }
 
-// ── DRAWER ───────────────────────────────────────────────────────────────────
-function openDrawer() {
-  document.getElementById('drawer').classList.add('open');
-  document.getElementById('dbg').classList.add('open');
-}
-function closeDrawer() {
-  document.getElementById('drawer').classList.remove('open');
-  document.getElementById('dbg').classList.remove('open');
+// ── VOICE SETUP ───────────────────────────────────────────────────────────────
+function copyVoiceScript() {
+  var script = document.getElementById('voice-script-preview').textContent;
+  navigator.clipboard.writeText(script).then(function() {
+    var btn = document.getElementById('voice-copy-btn');
+    btn.textContent = 'COPIED!';
+    setTimeout(function(){ btn.textContent = 'COPY SCRIPT'; }, 2000);
+    showToast('SCRIPT COPIED — PASTE INTO COWORK');
+  });
 }
 
-async function generate() {
+// [generate() removed — AI post writer replaced by voice setup flow]
+async function generate_removed() {
   var sq = document.getElementById('d-sq').value;
   var q1El = document.getElementById('d-q1');
   var q2El = document.getElementById('d-q2');
@@ -2321,6 +2083,7 @@ function openLogPost(bingoHint) {
   var nameEl = document.getElementById('log-who-name');
   if (nameEl) nameEl.textContent = me ? me.n : 'nobody — pick your name first';
   document.getElementById('log-url-input').value = '';
+  document.getElementById('log-title-input').value = '';
   document.getElementById('log-result').style.display = 'none';
   var hintEl = document.getElementById('log-bingo-hint');
   if (hintEl) {
@@ -2344,8 +2107,9 @@ function submitLogPost() {
   var already = loggedPosts.find(function(p){ return p.url === url; });
   if (already) { showToast('ALREADY LOGGED'); return; }
 
-  // Add the post
-  var post = { name: me.n, url: url, date: new Date().toLocaleDateString('en-GB', {day:'numeric',month:'short'}) };
+  // Add the post — grab optional opening line for the drawer preview
+  var openingLine = (document.getElementById('log-title-input').value || '').trim();
+  var post = { name: me.n, url: url, date: new Date().toLocaleDateString('en-GB', {day:'numeric',month:'short'}), title: openingLine };
   loggedPosts.push(post);
 
   // Update team score
@@ -2382,14 +2146,14 @@ function submitLogPost() {
   fetch('https://post-with-intent-proxy.sara-690.workers.dev/api/log-post', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ person: me.n, linkedinUrl: url, date: today })
+    body: JSON.stringify({ person: me.n, linkedinUrl: url, date: today, openingLine: openingLine })
   }).catch(function(e) { console.error('Failed to save to Notion', e); });
 }
 
 function renderLogHistory() {
   var el = document.getElementById('log-history');
   if (!el || !loggedPosts.length) { if(el) el.innerHTML = ''; return; }
-  var html = '<div style="font-size:10px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">Posts logged this session</div>';
+  var html = '<div style="font-size:10px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">Recent posts</div>';
   loggedPosts.slice(-5).reverse().forEach(function(p) {
     html += '<div style="display:flex;gap:8px;align-items:flex-start;padding:7px 0;border-bottom:1px solid var(--border2);font-size:12px">'
       + '<span style="color:var(--gold);font-weight:700;flex-shrink:0">' + p.name + '</span>'

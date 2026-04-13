@@ -703,9 +703,33 @@ Once you have my answers, synthesise and give me my voice profile, pillars, and 
     </div>
 
     <div style="border-top:2px solid var(--border2);padding-top:16px">
-      <div style="font-size:12px;font-weight:700;color:var(--cream2);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px">NEXT: POST-WRITING SKILL</div>
-      <div style="font-size:13px;color:var(--cream2);line-height:1.65;margin-bottom:12px">Once you've run the interview and saved your voice profile, you'll use the post-writing skill to write every post. It reads your voice automatically.</div>
-      <button disabled style="font-family:inherit;font-size:13px;font-weight:700;color:var(--grey);background:var(--panel2);border:2px solid var(--border2);padding:10px 18px;cursor:not-allowed;opacity:0.5;width:100%">⬇ DOWNLOAD POST-WRITING SKILL — COMING SOON</button>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div style="font-size:12px;font-weight:700;color:var(--cream2);text-transform:uppercase;letter-spacing:0.08em">STEP 2: POST-WRITING SCRIPT</div>
+        <button onclick="copyPostScript()" style="font-family:inherit;font-size:12px;font-weight:700;color:var(--bg);background:var(--gold);border:none;padding:6px 14px;cursor:pointer;box-shadow:0 2px 0 #9a7a00" id="post-copy-btn">COPY PASTE POST WRITING SKILL</button>
+      </div>
+      <div style="font-size:13px;color:var(--cream2);line-height:1.65;margin-bottom:10px">Once you have your voice profile, open a new Cowork chat, paste this in, and follow the prompts to write your post.</div>
+      <div style="background:var(--bg);border:2px solid var(--border2);padding:14px 16px;max-height:180px;overflow-y:auto;font-size:12px;color:var(--cream2);line-height:1.8;white-space:pre-wrap;font-family:monospace" id="post-script-preview">I've done my LinkedIn identity interview and I have my voice profile and posting pillars. I want to write a post.
+Here's my profile and pillars:
+[paste your output from the interview here]
+Your job is to help me write one post that sounds like me — not a LinkedIn template, not a list of lessons, not "Here's what I learned." Something real.
+Run this as a conversation. One question at a time.
+Start by asking me: "What's the thing from this week you keep thinking about — a conversation, a result, something that surprised you, or something you noticed?"
+Then ask follow-up questions to get the specific detail out:
+- Who was involved? What actually happened?
+- What did you think or feel in that moment?
+- What would you say about it to a colleague over lunch — not on LinkedIn, just to a person?
+- Is there a number, a quote, a before/after, or a single image that captures it?
+Once you have enough, write a first draft. Keep it short — under 200 words. One idea. No hook formula ("Here's the thing about X"). No bullet point lessons at the end. Write it the way they'd actually say it.
+Then ask: "Does this sound like you? What's off?"
+Iterate once or twice based on their feedback. Don't rewrite from scratch — adjust.
+After the final version, give the "good enough" signal:
+Check it against these four things and tell me the result:
+1. Does it sound like me, not like a generic LinkedIn voice?
+2. Is there one specific detail in it — a number, a moment, a name, a reaction?
+3. Is it making one point, not three?
+4. Would I be comfortable if my team, a client, or someone I respect saw this?
+If it passes all four, say: "This is ready. The version you write after another 20 minutes of editing won't perform better than this one. Post it."
+If something's off, tell me exactly what and fix it together.</div>
     </div>
   </div>
 </div>
@@ -1569,6 +1593,15 @@ function copyVoiceScript() {
     btn.textContent = 'COPIED!';
     setTimeout(function(){ btn.textContent = 'COPY SCRIPT'; }, 2000);
     showToast('SCRIPT COPIED — PASTE INTO COWORK');
+  });
+}
+function copyPostScript() {
+  var script = document.getElementById('post-script-preview').textContent;
+  navigator.clipboard.writeText(script).then(function() {
+    var btn = document.getElementById('post-copy-btn');
+    btn.textContent = 'COPIED!';
+    setTimeout(function(){ btn.textContent = 'COPY PASTE POST WRITING SKILL'; }, 2000);
+    showToast('POST SCRIPT COPIED — PASTE INTO COWORK');
   });
 }
 

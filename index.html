@@ -591,7 +591,7 @@ canvas#world { display: block; width: 100%; height: 100%; image-rendering: pixel
 
 <!-- LOG POST MODAL -->
 <div class="modal-bg" id="log-modal" onclick="bgC(event,'log-modal')">
-  <div class="rules-box" style="max-width:420px">
+  <div class="rules-box" style="max-width:440px">
     <div class="rules-hrow">
       <div><div class="rules-title" style="font-size:20px">LOG A POST</div><div class="rules-sub">Paste your LinkedIn URL to claim your point.</div></div>
       <button class="px-x" onclick="closeM('log-modal')">&#10005;</button>
@@ -599,14 +599,23 @@ canvas#world { display: block; width: 100%; height: 100%; image-rendering: pixel
     <div id="log-who-check" style="margin-bottom:14px;padding:10px 14px;background:var(--bg);border:2px solid var(--border2);font-size:13px;color:var(--cream2)">
       Logging as: <span id="log-who-name" style="color:var(--gold);font-weight:700">nobody — pick your name first</span>
     </div>
-    <div id="log-bingo-hint" style="display:none;margin-bottom:12px;padding:8px 12px;background:rgba(244,196,48,0.1);border:2px solid var(--gold);font-size:12px;font-weight:700;color:var(--gold);line-height:1.4"></div>
-    <div style="margin-bottom:10px">
+    <div style="margin-bottom:12px">
       <div class="dql" style="margin-bottom:6px">LINKEDIN POST URL</div>
       <input id="log-url-input" type="url" placeholder="https://www.linkedin.com/posts/..." style="font-family:inherit;font-size:13px;color:var(--cream);background:var(--bg);border:2px solid var(--border2);padding:10px 12px;width:100%;box-sizing:border-box;outline:none">
     </div>
-    <div style="margin-bottom:10px">
-      <div class="dql" style="margin-bottom:4px">ADD DESCRIPTION <span style="font-weight:500;color:var(--grey);font-size:11px;text-transform:none;letter-spacing:0">(optional — helps you remember what the post was about)</span></div>
-      <input id="log-title-input" type="text" placeholder="e.g. I had a call last week that changed how I think about..." style="font-family:inherit;font-size:13px;color:var(--cream);background:var(--bg);border:2px solid var(--border2);padding:10px 12px;width:100%;box-sizing:border-box;outline:none;margin-bottom:10px">
+    <div style="margin-bottom:14px">
+      <div class="dql" style="margin-bottom:4px">POST DESCRIPTION <span style="font-weight:700;color:var(--coral);font-size:11px;text-transform:none;letter-spacing:0">* required</span></div>
+      <input id="log-title-input" type="text" placeholder="e.g. I had a call last week that changed how I think about..." style="font-family:inherit;font-size:13px;color:var(--cream);background:var(--bg);border:2px solid var(--border2);padding:10px 12px;width:100%;box-sizing:border-box;outline:none">
+      <div id="log-desc-error" style="display:none;font-size:11px;color:var(--coral);margin-top:5px;font-weight:700">Add a description before logging.</div>
+    </div>
+    <div style="margin-bottom:16px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div class="dql">BINGO CHALLENGE <span style="font-weight:500;color:var(--grey);font-size:11px;text-transform:none;letter-spacing:0">(optional)</span></div>
+        <button onclick="clearBingoSelection()" id="bingo-clear-btn" style="display:none;font-family:inherit;font-size:11px;font-weight:700;color:var(--grey);background:transparent;border:1px solid var(--border2);padding:3px 8px;cursor:pointer">CLEAR</button>
+      </div>
+      <div id="modal-bingo-selected" style="display:none;margin-bottom:8px;padding:7px 10px;background:rgba(244,196,48,0.1);border:2px solid var(--gold);font-size:12px;font-weight:700;color:var(--gold);line-height:1.4"></div>
+      <div id="modal-bingo-grid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:3px;"></div>
+      <div style="font-size:11px;color:var(--grey);margin-top:6px;line-height:1.5">Tap a square to claim it with this post. &#10003; = already claimed.</div>
     </div>
     <button onclick="submitLogPost()" style="font-family:inherit;font-size:14px;font-weight:800;background:var(--green);color:var(--bg);border:none;padding:12px 20px;cursor:pointer;width:100%;box-shadow:0 3px 0 #2a7a45;margin-bottom:10px">CLAIM MY POINT &#9658;</button>
     <div id="log-result" style="display:none;padding:10px 14px;font-size:13px;line-height:1.6;border:2px solid var(--green);color:var(--green)"></div>
@@ -1363,12 +1372,54 @@ function renderLogHistory() {
   loggedPosts.slice(-5).reverse().forEach(function(p) {
     html += '<div style="display:flex;gap:8px;align-items:flex-start;padding:7px 0;border-bottom:1px solid var(--border2);font-size:12px">'
       + '<span style="color:var(--gold);font-weight:700;flex-shrink:0">' + p.name + '</span>'
-      + '<a href="' + p.url + '" target="_blank" style="color:var(--blue);text-decoration:none;word-break:break-all;flex:1">' + p.date + ' &#8599;</a>'
+      + '<span style="color:var(--cream2);flex:1;line-height:1.4">' + (p.title || '') + '</span>'
+      + '<a href="' + p.url + '" target="_blank" style="color:var(--blue);text-decoration:none;flex-shrink:0;margin-left:6px">' + p.date + ' &#8599;</a>'
       + '</div>';
   });
   el.innerHTML = html;
 }
 
+function renderModalBingoGrid() {
+  var grid = document.getElementById('modal-bingo-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  BINGO_SQUARES.forEach(function(sq) {
+    var cell = document.createElement('div');
+    var isDone = sq.id === 'FREE' || bingoState[sq.id];
+    var isActive = activeBingoSquare === sq.id;
+    cell.style.cssText = 'aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-size:8px;font-weight:600;line-height:1.3;padding:3px;border:2px solid ' + (isActive ? 'var(--gold)' : isDone ? 'var(--green)' : 'var(--border2)') + ';background:' + (isActive ? 'rgba(244,196,48,0.2)' : isDone ? 'rgba(78,203,113,0.1)' : 'var(--bg)') + ';color:' + (isActive ? 'var(--gold)' : isDone ? 'var(--green)' : 'var(--cream2)') + ';cursor:' + (isDone || sq.id === "FREE" ? 'default' : 'pointer') + ';transition:all 0.1s;';
+    if (sq.id === 'FREE') {
+      cell.innerHTML = '<span style="font-size:12px">&#9733;</span><span style="font-size:7px;margin-top:1px">FREE</span>';
+    } else if (isDone) {
+      cell.innerHTML = '<span style="font-size:13px">&#10003;</span>';
+    } else {
+      cell.innerHTML = '<span style="font-size:11px;margin-bottom:1px">' + sq.emoji + '</span><span>' + sq.label + '</span>';
+    }
+    cell.title = sq.label;
+    if (!isDone && sq.id !== 'FREE') {
+      cell.onmouseover = function() { if (!isActive) this.style.borderColor = 'var(--gold)'; };
+      cell.onmouseout = function() { if (activeBingoSquare !== sq.id) this.style.borderColor = 'var(--border2)'; };
+      cell.onclick = function() {
+        activeBingoSquare = sq.id;
+        var sel = document.getElementById('modal-bingo-selected');
+        var clearBtn = document.getElementById('bingo-clear-btn');
+        if (sel) { sel.textContent = sq.emoji + ' ' + sq.label; sel.style.display = 'block'; }
+        if (clearBtn) clearBtn.style.display = 'block';
+        renderModalBingoGrid();
+      };
+    }
+    grid.appendChild(cell);
+  });
+}
+
+function clearBingoSelection() {
+  activeBingoSquare = null;
+  var sel = document.getElementById('modal-bingo-selected');
+  var clearBtn = document.getElementById('bingo-clear-btn');
+  if (sel) sel.style.display = 'none';
+  if (clearBtn) clearBtn.style.display = 'none';
+  renderModalBingoGrid();
+}
 
 function renderBingo() {
   var grid = document.getElementById('bingo-grid');
@@ -2118,16 +2169,22 @@ function openLogPost(bingoHint) {
   document.getElementById('log-url-input').value = '';
   document.getElementById('log-title-input').value = '';
   document.getElementById('log-result').style.display = 'none';
-  var hintEl = document.getElementById('log-bingo-hint');
-  if (hintEl) {
-    if (bingoHint) {
-      hintEl.textContent = 'Logging for bingo square: ' + bingoHint;
-      hintEl.style.display = 'block';
-    } else {
-      hintEl.style.display = 'none';
-      activeBingoSquare = null;
-    }
+  var descErr = document.getElementById('log-desc-error');
+  if (descErr) descErr.style.display = 'none';
+  // activeBingoSquare is set if coming from bingo board — otherwise clear it
+  if (!bingoHint) activeBingoSquare = null;
+  // Update the bingo selected display
+  var sel = document.getElementById('modal-bingo-selected');
+  var clearBtn = document.getElementById('bingo-clear-btn');
+  if (activeBingoSquare) {
+    var sq = BINGO_SQUARES.find(function(s){ return s.id === activeBingoSquare; });
+    if (sel && sq) { sel.textContent = sq.emoji + ' ' + sq.label; sel.style.display = 'block'; }
+    if (clearBtn) clearBtn.style.display = 'block';
+  } else {
+    if (sel) sel.style.display = 'none';
+    if (clearBtn) clearBtn.style.display = 'none';
   }
+  renderModalBingoGrid();
   renderLogHistory();
   openM('log-modal');
 }
@@ -2136,12 +2193,21 @@ function submitLogPost() {
   if (!me) { showToast('PICK YOUR NAME FIRST'); return; }
   var url = document.getElementById('log-url-input').value.trim();
   if (!url || !url.includes('linkedin.com')) { showToast('PASTE A VALID LINKEDIN URL'); return; }
+  // Require description
+  var openingLine = (document.getElementById('log-title-input').value || '').trim();
+  if (!openingLine) {
+    var descErr = document.getElementById('log-desc-error');
+    if (descErr) descErr.style.display = 'block';
+    document.getElementById('log-title-input').focus();
+    return;
+  }
+  var descErrHide = document.getElementById('log-desc-error');
+  if (descErrHide) descErrHide.style.display = 'none';
   // Check not already logged
   var already = loggedPosts.find(function(p){ return p.url === url; });
   if (already) { showToast('ALREADY LOGGED'); return; }
 
-  // Add the post — grab optional opening line for the drawer preview
-  var openingLine = (document.getElementById('log-title-input').value || '').trim();
+  // Add the post
   var post = { name: me.n, url: url, date: new Date().toLocaleDateString('en-GB', {day:'numeric',month:'short'}), title: openingLine };
   loggedPosts.push(post);
 

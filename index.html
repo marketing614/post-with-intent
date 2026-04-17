@@ -97,8 +97,8 @@ html {
 /* ── WORLD SCENE (Blobby + environment) ── */
 .world-card {
   position: relative; overflow: hidden;
-  margin-bottom: 20px;
-  height: 200px;
+  margin-bottom: 24px;
+  height: 220px;
 }
 .world-canvas-wrap {
   position: absolute; inset: 0;
@@ -134,7 +134,7 @@ canvas#world { display: block; width: 100%; height: 100%; image-rendering: pixel
 }
 
 /* ── TEAM PROGRESS BAR ── */
-.progress-card { padding: 18px 20px; margin-bottom: 20px; }
+.progress-card { padding: 22px 24px; margin-bottom: 24px; }
 .progress-label {
   font-family: 'Inter', sans-serif;
   font-size: 15px; font-weight: 700; color: var(--cream2);
@@ -381,7 +381,7 @@ canvas#world { display: block; width: 100%; height: 100%; image-rendering: pixel
   display: flex; align-items: center; justify-content: center;
   text-align: center;
   font-family: 'Inter', sans-serif;
-  font-size: 9px; font-weight: 600; line-height: 1.3;
+  font-size: 11px; font-weight: 600; line-height: 1.3;
   color: var(--cream2);
   background: var(--bg);
   border: 2px solid var(--border2);
@@ -551,14 +551,6 @@ canvas#world { display: block; width: 100%; height: 100%; image-rendering: pixel
       <div class="panel" style="padding:18px 20px;margin-bottom:16px">
         <div class="section-heading">LATEST FROM MWI</div>
         <div id="mwi-feed" style="margin-top:4px">
-          <div style="font-size:12px;color:var(--grey)">Loading...</div>
-        </div>
-      </div>
-
-      <!-- TEAM RECENT POSTS FEED -->
-      <div class="panel" style="padding:18px 20px;margin-bottom:16px">
-        <div class="section-heading">LATEST FROM THE TEAM</div>
-        <div id="team-feed" style="margin-top:4px">
           <div style="font-size:12px;color:var(--grey)">Loading...</div>
         </div>
       </div>
@@ -2337,10 +2329,25 @@ function submitCompanyPost() {
   });
 }
 
-function fetchOembed(postUrl) {
-  return fetch('https://post-with-intent-proxy.sara-690.workers.dev/api/oembed?url=' + encodeURIComponent(postUrl))
-    .then(function(r){ return r.json(); })
-    .catch(function(){ return null; });
+function getLinkedInEmbedUrl(postUrl) {
+  // Convert a linkedin.com/posts/... URL to an embed URL
+  // LinkedIn embed format: linkedin.com/embed/feed/update/urn:li:share:...
+  // We extract the activity ID from the URL
+  var match = postUrl.match(/activity[-:](\d+)/);
+  if (match) {
+    return 'https://www.linkedin.com/embed/feed/update/urn:li:activity:' + match[1];
+  }
+  // Try ugcPost format
+  var ugcMatch = postUrl.match(/ugcPost[-:](\d+)/);
+  if (ugcMatch) {
+    return 'https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:' + ugcMatch[1];
+  }
+  // Try share format from URL like /posts/name_words-7123456789012345678-xxxx/
+  var shareMatch = postUrl.match(/-(\d{15,})-/);
+  if (shareMatch) {
+    return 'https://www.linkedin.com/embed/feed/update/urn:li:activity:' + shareMatch[1];
+  }
+  return null;
 }
 
 function renderPostCards(posts, containerId, showPerson) {
@@ -2350,31 +2357,19 @@ function renderPostCards(posts, containerId, showPerson) {
     el.innerHTML = '<div style="font-size:12px;color:var(--grey);padding:4px 0">No posts yet.</div>';
     return;
   }
-  // Render placeholder cards first, then load embeds
   el.innerHTML = '';
-  posts.forEach(function(p, i) {
-    var cardId = containerId + '-card-' + i;
+  posts.forEach(function(p) {
     var dateStr = p.date ? new Date(p.date).toLocaleDateString('en-GB', {day:'numeric', month:'short'}) : '';
-    var header = showPerson
-      ? '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><span style="font-size:12px;font-weight:800;color:var(--gold)">' + p.person + '</span><span style="font-size:11px;color:var(--grey)">' + dateStr + '</span></div>'
-      : '<div style="font-size:11px;color:var(--grey);margin-bottom:8px">' + dateStr + '</div>';
+    var embedUrl = getLinkedInEmbedUrl(p.url);
     var div = document.createElement('div');
     div.style.cssText = 'padding:12px 0;border-bottom:1px solid var(--border2)';
-    div.innerHTML = header
-      + '<div style="font-size:13px;color:var(--cream);line-height:1.5;margin-bottom:10px">' + p.title + '</div>'
-      + '<div id="' + cardId + '" style="min-height:40px"><div style="font-size:11px;color:var(--grey)">Loading preview...</div></div>';
+    var embedHtml = embedUrl
+      ? '<iframe src="' + embedUrl + '" height="400" width="100%" frameborder="0" allowfullscreen style="display:block;margin-top:10px;background:#fff;border-radius:2px" title="LinkedIn post"></iframe>'
+      : '<a href="' + p.url + '" target="_blank" style="font-size:12px;color:var(--blue);text-decoration:none;font-weight:700;display:block;margin-top:8px">View on LinkedIn &#8599;</a>';
+    div.innerHTML = '<div style="font-size:11px;color:var(--grey);margin-bottom:6px">' + dateStr + '</div>'
+      + '<div style="font-size:13px;color:var(--cream);line-height:1.5">' + p.title + '</div>'
+      + embedHtml;
     el.appendChild(div);
-
-    // Async load the embed
-    fetchOembed(p.url).then(function(oembed) {
-      var cardEl = document.getElementById(cardId);
-      if (!cardEl) return;
-      if (oembed && oembed.html) {
-        cardEl.innerHTML = '<div style="max-width:100%;overflow:hidden">' + oembed.html + '</div>';
-      } else {
-        cardEl.innerHTML = '<a href="' + p.url + '" target="_blank" style="font-size:12px;color:var(--blue);text-decoration:none;font-weight:700">View on LinkedIn &#8599;</a>';
-      }
-    });
   });
 }
 
@@ -2388,19 +2383,8 @@ function loadCompanyFeed() {
     });
 }
 
-function loadTeamFeed() {
-  fetch('https://post-with-intent-proxy.sara-690.workers.dev/api/recent-posts')
-    .then(function(r){ return r.json(); })
-    .then(function(data) { renderPostCards(data.posts, 'team-feed', true); })
-    .catch(function() {
-      var el = document.getElementById('team-feed');
-      if (el) el.innerHTML = '<div style="font-size:12px;color:var(--grey)">Could not load posts.</div>';
-    });
-}
-
-// Load both feeds on page start
+// Load company feed on page start
 loadCompanyFeed();
-loadTeamFeed();
 
 // Resize world canvas properly
 function resizeWorld() {

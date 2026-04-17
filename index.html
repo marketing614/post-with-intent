@@ -65,9 +65,9 @@ html {
   position: sticky; top: 0; z-index: 100;
 }
 .nav-inner {
-  max-width: 960px; margin: 0 auto;
+  max-width: 1200px; margin: 0 auto;
   display: flex; align-items: center; justify-content: space-between;
-  padding: 0 24px; height: 52px;
+  padding: 0 16px; height: 52px;
 }
 .nav-logo {
   font-family: 'Inter', sans-serif;
@@ -92,7 +92,7 @@ html {
 .user-btn:active { transform: translate(2px,2px); box-shadow: none; }
 
 /* ── PAGE ── */
-.page { max-width: 960px; margin: 0 auto; padding: 24px 24px 80px; }
+.page { max-width: 1200px; margin: 0 auto; padding: 20px 16px 80px; }
 
 /* ── WORLD SCENE (Blobby + environment) ── */
 .world-card {
@@ -180,7 +180,7 @@ canvas#world { display: block; width: 100%; height: 100%; image-rendering: pixel
 .mm-ico { font-size: 16px; }
 
 /* ── MAIN GRID ── */
-.main-grid { display: grid; grid-template-columns: 1fr 260px; gap: 16px; align-items: start; }
+.main-grid { display: grid; grid-template-columns: 1fr 300px; gap: 20px; align-items: start; }
 
 .px-btn {
   font-family: 'Inter', sans-serif;
@@ -551,6 +551,14 @@ canvas#world { display: block; width: 100%; height: 100%; image-rendering: pixel
       <div class="panel" style="padding:18px 20px;margin-bottom:16px">
         <div class="section-heading">LATEST FROM MWI</div>
         <div id="mwi-feed" style="margin-top:4px">
+          <div style="font-size:12px;color:var(--grey)">Loading...</div>
+        </div>
+      </div>
+
+      <!-- TEAM RECENT POSTS FEED -->
+      <div class="panel" style="padding:18px 20px;margin-bottom:16px">
+        <div class="section-heading">LATEST FROM THE TEAM</div>
+        <div id="team-feed" style="margin-top:4px">
           <div style="font-size:12px;color:var(--grey)">Loading...</div>
         </div>
       </div>
@@ -2329,36 +2337,70 @@ function submitCompanyPost() {
   });
 }
 
+function fetchOembed(postUrl) {
+  return fetch('https://post-with-intent-proxy.sara-690.workers.dev/api/oembed?url=' + encodeURIComponent(postUrl))
+    .then(function(r){ return r.json(); })
+    .catch(function(){ return null; });
+}
+
+function renderPostCards(posts, containerId, showPerson) {
+  var el = document.getElementById(containerId);
+  if (!el) return;
+  if (!posts || !posts.length) {
+    el.innerHTML = '<div style="font-size:12px;color:var(--grey);padding:4px 0">No posts yet.</div>';
+    return;
+  }
+  // Render placeholder cards first, then load embeds
+  el.innerHTML = '';
+  posts.forEach(function(p, i) {
+    var cardId = containerId + '-card-' + i;
+    var dateStr = p.date ? new Date(p.date).toLocaleDateString('en-GB', {day:'numeric', month:'short'}) : '';
+    var header = showPerson
+      ? '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><span style="font-size:12px;font-weight:800;color:var(--gold)">' + p.person + '</span><span style="font-size:11px;color:var(--grey)">' + dateStr + '</span></div>'
+      : '<div style="font-size:11px;color:var(--grey);margin-bottom:8px">' + dateStr + '</div>';
+    var div = document.createElement('div');
+    div.style.cssText = 'padding:12px 0;border-bottom:1px solid var(--border2)';
+    div.innerHTML = header
+      + '<div style="font-size:13px;color:var(--cream);line-height:1.5;margin-bottom:10px">' + p.title + '</div>'
+      + '<div id="' + cardId + '" style="min-height:40px"><div style="font-size:11px;color:var(--grey)">Loading preview...</div></div>';
+    el.appendChild(div);
+
+    // Async load the embed
+    fetchOembed(p.url).then(function(oembed) {
+      var cardEl = document.getElementById(cardId);
+      if (!cardEl) return;
+      if (oembed && oembed.html) {
+        cardEl.innerHTML = '<div style="max-width:100%;overflow:hidden">' + oembed.html + '</div>';
+      } else {
+        cardEl.innerHTML = '<a href="' + p.url + '" target="_blank" style="font-size:12px;color:var(--blue);text-decoration:none;font-weight:700">View on LinkedIn &#8599;</a>';
+      }
+    });
+  });
+}
+
 function loadCompanyFeed() {
   fetch('https://post-with-intent-proxy.sara-690.workers.dev/api/company-posts')
     .then(function(r){ return r.json(); })
-    .then(function(data) {
-      var el = document.getElementById('mwi-feed');
-      if (!el) return;
-      if (!data.posts || !data.posts.length) {
-        el.innerHTML = '<div style="font-size:12px;color:var(--grey);padding:4px 0">No company posts yet.</div>';
-        return;
-      }
-      var html = '';
-      data.posts.forEach(function(p) {
-        var dateStr = p.date ? new Date(p.date).toLocaleDateString('en-GB', {day:'numeric', month:'short'}) : '';
-        html += '<div style="padding:10px 0;border-bottom:1px solid var(--border2)">'
-          + '<div style="font-size:13px;color:var(--cream);line-height:1.5;margin-bottom:4px">' + p.title + '</div>'
-          + '<div style="display:flex;align-items:center;justify-content:space-between">'
-          + '<span style="font-size:11px;color:var(--grey)">' + dateStr + '</span>'
-          + '<a href="' + p.url + '" target="_blank" style="font-size:11px;color:var(--blue);text-decoration:none;font-weight:700">View post &#8599;</a>'
-          + '</div></div>';
-      });
-      el.innerHTML = html;
-    })
+    .then(function(data) { renderPostCards(data.posts, 'mwi-feed', false); })
     .catch(function() {
       var el = document.getElementById('mwi-feed');
       if (el) el.innerHTML = '<div style="font-size:12px;color:var(--grey)">Could not load posts.</div>';
     });
 }
 
-// Load company feed on page start
+function loadTeamFeed() {
+  fetch('https://post-with-intent-proxy.sara-690.workers.dev/api/recent-posts')
+    .then(function(r){ return r.json(); })
+    .then(function(data) { renderPostCards(data.posts, 'team-feed', true); })
+    .catch(function() {
+      var el = document.getElementById('team-feed');
+      if (el) el.innerHTML = '<div style="font-size:12px;color:var(--grey)">Could not load posts.</div>';
+    });
+}
+
+// Load both feeds on page start
 loadCompanyFeed();
+loadTeamFeed();
 
 // Resize world canvas properly
 function resizeWorld() {

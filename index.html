@@ -1569,6 +1569,7 @@ function renderLB() {
 function renderAvatars() {
   renderWorldNames();
   var container = document.getElementById('avatars-grid');
+  if (!container) { renderPostLogList(); return; }
   container.innerHTML = '';
   TEAM.forEach(function(t) {
     var posted = t.posted;

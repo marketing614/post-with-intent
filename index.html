@@ -495,6 +495,7 @@ canvas#world { display: block; width: 100%; height: 100%; image-rendering: pixel
       <button class="user-btn" onclick="openRules()" style="color:var(--cream2)">RULES &amp; INFO</button>
       <button class="user-btn" onclick="openM('voice-modal')" style="color:var(--blue)">✦ SET UP YOUR VOICE</button>
       <button class="user-btn" onclick="loadPostsFromNotion()" style="color:var(--cream2)" title="Refresh scores from Notion">↻ REFRESH</button>
+    <button id="mwi-post-btn" style="display:none;font-family:inherit;font-size:13px;font-weight:700;color:var(--gold);background:var(--panel2);border:2px solid var(--gold);padding:6px 14px;cursor:pointer;box-shadow:2px 2px 0 #7a5a00" onclick="openLogCompanyPost()">+ MWI POST</button>
     <button class="user-btn" onclick="openLogPost()" style="background:var(--green);color:var(--bg);font-weight:800;border:none;padding:6px 14px;cursor:pointer">+ LOG POST</button>
     </div>
   </div>
@@ -546,15 +547,13 @@ canvas#world { display: block; width: 100%; height: 100%; image-rendering: pixel
     <!-- LEFT COL -->
     <div>
 
-      <!-- MWI LINKEDIN FEED — placeholder, wire up via Make automation when ready -->
-      <!--
+      <!-- MWI LINKEDIN FEED -->
       <div class="panel" style="padding:18px 20px;margin-bottom:16px">
         <div class="section-heading">LATEST FROM MWI</div>
-        <div id="mwi-feed">
-          [Posts pulled from Make automation — show last 3-5, card per post: first line + LinkedIn URL]
+        <div id="mwi-feed" style="margin-top:4px">
+          <div style="font-size:12px;color:var(--grey)">Loading...</div>
         </div>
       </div>
-      -->
 
       <!-- WHO POSTED THIS WEEK -->
       <div class="team-card panel" style="margin-bottom:16px">
@@ -620,6 +619,27 @@ canvas#world { display: block; width: 100%; height: 100%; image-rendering: pixel
     <button onclick="submitLogPost()" style="font-family:inherit;font-size:14px;font-weight:800;background:var(--green);color:var(--bg);border:none;padding:12px 20px;cursor:pointer;width:100%;box-shadow:0 3px 0 #2a7a45;margin-bottom:10px">CLAIM MY POINT &#9658;</button>
     <div id="log-result" style="display:none;padding:10px 14px;font-size:13px;line-height:1.6;border:2px solid var(--green);color:var(--green)"></div>
     <div id="log-history" style="margin-top:14px"></div>
+  </div>
+</div>
+
+<!-- COMPANY POST MODAL — Sara only -->
+<div class="modal-bg" id="company-log-modal" onclick="bgC(event,'company-log-modal')">
+  <div class="rules-box" style="max-width:420px">
+    <div class="rules-hrow">
+      <div><div class="rules-title" style="font-size:20px;color:var(--gold)">LOG MWI POST</div><div class="rules-sub">Add the latest company post to the feed.</div></div>
+      <button class="px-x" onclick="closeM('company-log-modal')">&#10005;</button>
+    </div>
+    <div style="margin-bottom:12px">
+      <div class="dql" style="margin-bottom:6px">LINKEDIN POST URL</div>
+      <input id="company-url-input" type="url" placeholder="https://www.linkedin.com/posts/made-with-intent..." style="font-family:inherit;font-size:13px;color:var(--cream);background:var(--bg);border:2px solid var(--border2);padding:10px 12px;width:100%;box-sizing:border-box;outline:none">
+    </div>
+    <div style="margin-bottom:16px">
+      <div class="dql" style="margin-bottom:4px">POST DESCRIPTION <span style="font-weight:700;color:var(--coral);font-size:11px;text-transform:none;letter-spacing:0">* required</span></div>
+      <input id="company-title-input" type="text" placeholder="e.g. 83% of shoppers use discounts they didn't need..." style="font-family:inherit;font-size:13px;color:var(--cream);background:var(--bg);border:2px solid var(--border2);padding:10px 12px;width:100%;box-sizing:border-box;outline:none">
+      <div id="company-desc-error" style="display:none;font-size:11px;color:var(--coral);margin-top:5px;font-weight:700">Add a description before saving.</div>
+    </div>
+    <button onclick="submitCompanyPost()" style="font-family:inherit;font-size:14px;font-weight:800;background:var(--gold);color:var(--bg);border:none;padding:12px 20px;cursor:pointer;width:100%;box-shadow:0 3px 0 #9a7a00;margin-bottom:10px">ADD TO FEED &#9658;</button>
+    <div id="company-log-result" style="display:none;padding:10px 14px;font-size:13px;line-height:1.6;border:2px solid var(--green);color:var(--green)"></div>
   </div>
 </div>
 
@@ -1629,6 +1649,9 @@ function pickMe(i) {
 function applyMe() {
   if(!me) return;
   document.getElementById('u-btn').textContent = '● ' + me.n.toUpperCase();
+  // MWI POST button only visible to Sara
+  var mwiBtn = document.getElementById('mwi-post-btn');
+  if (mwiBtn) mwiBtn.style.display = me.n === 'Sara' ? 'block' : 'none';
 }
 function loadMe() {
   var s = localStorage.getItem('pwi_me');
@@ -2266,6 +2289,76 @@ function renderLogHistory() {
 // (duplicate renderBingo removed — using the full interactive version defined above)
 
 loadMe(); renderLB(); renderAvatars(); renderBingo();
+
+// ── COMPANY POST FEED ─────────────────────────────────────────────────────────
+
+function openLogCompanyPost() {
+  document.getElementById('company-url-input').value = '';
+  document.getElementById('company-title-input').value = '';
+  document.getElementById('company-log-result').style.display = 'none';
+  document.getElementById('company-desc-error').style.display = 'none';
+  openM('company-log-modal');
+}
+
+function submitCompanyPost() {
+  var url = document.getElementById('company-url-input').value.trim();
+  if (!url || !url.includes('linkedin.com')) { showToast('PASTE A VALID LINKEDIN URL'); return; }
+  var description = document.getElementById('company-title-input').value.trim();
+  if (!description) {
+    document.getElementById('company-desc-error').style.display = 'block';
+    document.getElementById('company-title-input').focus();
+    return;
+  }
+  document.getElementById('company-desc-error').style.display = 'none';
+
+  var today = new Date().toISOString().split('T')[0];
+  fetch('https://post-with-intent-proxy.sara-690.workers.dev/api/log-post', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ person: 'MWI', linkedinUrl: url, date: today, openingLine: description })
+  }).then(function() {
+    var resultEl = document.getElementById('company-log-result');
+    resultEl.textContent = 'Added to the MWI feed.';
+    resultEl.style.display = 'block';
+    document.getElementById('company-url-input').value = '';
+    document.getElementById('company-title-input').value = '';
+    showToast('MWI POST ADDED');
+    loadCompanyFeed();
+  }).catch(function() {
+    showToast('SOMETHING WENT WRONG');
+  });
+}
+
+function loadCompanyFeed() {
+  fetch('https://post-with-intent-proxy.sara-690.workers.dev/api/company-posts')
+    .then(function(r){ return r.json(); })
+    .then(function(data) {
+      var el = document.getElementById('mwi-feed');
+      if (!el) return;
+      if (!data.posts || !data.posts.length) {
+        el.innerHTML = '<div style="font-size:12px;color:var(--grey);padding:4px 0">No company posts yet.</div>';
+        return;
+      }
+      var html = '';
+      data.posts.forEach(function(p) {
+        var dateStr = p.date ? new Date(p.date).toLocaleDateString('en-GB', {day:'numeric', month:'short'}) : '';
+        html += '<div style="padding:10px 0;border-bottom:1px solid var(--border2)">'
+          + '<div style="font-size:13px;color:var(--cream);line-height:1.5;margin-bottom:4px">' + p.title + '</div>'
+          + '<div style="display:flex;align-items:center;justify-content:space-between">'
+          + '<span style="font-size:11px;color:var(--grey)">' + dateStr + '</span>'
+          + '<a href="' + p.url + '" target="_blank" style="font-size:11px;color:var(--blue);text-decoration:none;font-weight:700">View post &#8599;</a>'
+          + '</div></div>';
+      });
+      el.innerHTML = html;
+    })
+    .catch(function() {
+      var el = document.getElementById('mwi-feed');
+      if (el) el.innerHTML = '<div style="font-size:12px;color:var(--grey)">Could not load posts.</div>';
+    });
+}
+
+// Load company feed on page start
+loadCompanyFeed();
 
 // Resize world canvas properly
 function resizeWorld() {

@@ -2367,6 +2367,16 @@ function getLinkedInEmbedUrl(postUrl) {
   return null;
 }
 
+// Basic HTML escape so hook copy and URLs can never break out of the markup.
+function escapeHtml(str) {
+  return String(str || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 function renderPostCards(posts, containerId, showPerson) {
   var el = document.getElementById(containerId);
   if (!el) return;
@@ -2376,29 +2386,41 @@ function renderPostCards(posts, containerId, showPerson) {
   }
   el.innerHTML = '';
   posts.forEach(function(p) {
-    var dateStr = p.date ? new Date(p.date).toLocaleDateString('en-GB', {day:'numeric', month:'short'}) : '';
+    var dateStr = p.date ? new Date(p.date).toLocaleDateString('en-GB', {day:'numeric', month:'short'}).toUpperCase() : '';
     var card = document.createElement('div');
-    card.style.cssText = 'background:var(--panel2);border:2px solid var(--border2);overflow:hidden;display:flex;flex-direction:column;box-shadow:2px 2px 0 var(--border2)';
+    // align-self:start lets each card size to its own image aspect so a square
+    // single-image post and a wider carousel can sit side by side cleanly.
+    card.style.cssText = 'background:var(--panel2);border:2px solid var(--border2);overflow:hidden;display:flex;flex-direction:column;box-shadow:2px 2px 0 var(--border2);align-self:start';
 
-    // Image — show if available, else a tinted placeholder
+    // Image renders at whatever native aspect LinkedIn serves for the thumbnail,
+    // so single-image posts come through roughly square and carousels come through
+    // wider. No forced aspect ratio, no crop.
     var imageHtml;
     if (p.imageUrl) {
-      imageHtml = '<div style="aspect-ratio:16/9;overflow:hidden;flex-shrink:0">'
-        + '<img src="' + p.imageUrl + '" alt="" style="width:100%;height:100%;object-fit:cover;display:block">'
+      imageHtml = '<div style="overflow:hidden;flex-shrink:0;background:var(--bg)">'
+        + '<img src="' + escapeHtml(p.imageUrl) + '" alt="" style="width:100%;height:auto;display:block" loading="lazy">'
         + '</div>';
     } else {
-      imageHtml = '<div style="aspect-ratio:16/9;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-shrink:0;border-bottom:2px solid var(--border2)">'
+      imageHtml = '<div style="aspect-ratio:16/10;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-shrink:0;border-bottom:2px solid var(--border2)">'
         + '<div style="font-size:11px;font-weight:700;color:var(--grey);letter-spacing:0.08em">NO IMAGE</div>'
         + '</div>';
     }
 
-    // Hook text + footer
+    // Hook = first line of the post copy. Clamps to 2 lines. If the worker
+    // couldn't scrape a hook (login wall, carousel, etc.) the row drops out
+    // and the card shows image + date + link only.
+    var hookText = p.hook || '';
+    var hookHtml = hookText
+      ? '<div style="font-size:13px;font-weight:600;color:var(--cream);line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">'
+          + escapeHtml(hookText)
+        + '</div>'
+      : '';
+
     var bodyHtml = '<div style="padding:10px 12px;flex:1;display:flex;flex-direction:column;gap:10px">'
-      + '<div style="font-size:13px;font-weight:600;color:var(--cream);line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">'
-        + (p.title || '') + '</div>'
+      + hookHtml
       + '<div style="display:flex;align-items:center;justify-content:space-between;margin-top:auto">'
-        + '<span style="font-size:10px;font-weight:600;color:var(--grey)">' + dateStr + '</span>'
-        + '<a href="' + (p.url || '#') + '" target="_blank" style="font-size:11px;font-weight:800;color:var(--blue);text-decoration:none;letter-spacing:0.04em">VIEW POST &#8599;</a>'
+        + '<span style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.04em">' + escapeHtml(dateStr) + '</span>'
+        + '<a href="' + escapeHtml(p.url || '#') + '" target="_blank" rel="noopener" style="font-size:11px;font-weight:800;color:var(--blue);text-decoration:none;letter-spacing:0.04em">VIEW POST &#8599;</a>'
       + '</div>'
       + '</div>';
 
@@ -2414,16 +2436,26 @@ function loadCompanyFeed() {
     .then(function(data) {
       var posts = data.posts || [];
       if (!posts.length) { renderPostCards([], 'mwi-feed', false); return; }
-      // Fetch oEmbed thumbnail for each post in parallel, then render
-      var oembed = posts.map(function(p) {
+      // For each post, fetch oEmbed (thumbnail) and post-meta (hook via og:description)
+      // in parallel. Merge both onto the post object before rendering.
+      var enriched = posts.map(function(p) {
         if (!p.url) return Promise.resolve(p);
-        return fetch(WORKER + '/api/oembed?url=' + encodeURIComponent(p.url))
+        var oembed = fetch(WORKER + '/api/oembed?url=' + encodeURIComponent(p.url))
           .then(function(r){ return r.ok ? r.json() : {}; })
-          .then(function(oe){ return Object.assign({}, p, { imageUrl: oe.thumbnail_url || '' }); })
-          .catch(function(){ return p; });
+          .catch(function(){ return {}; });
+        var meta = fetch(WORKER + '/api/post-meta?url=' + encodeURIComponent(p.url))
+          .then(function(r){ return r.ok ? r.json() : {}; })
+          .catch(function(){ return {}; });
+        return Promise.all([oembed, meta]).then(function(results) {
+          var oe = results[0] || {};
+          var m  = results[1] || {};
+          // Prefer oEmbed thumbnail, fall back to og:image from the page scrape.
+          var imageUrl = oe.thumbnail_url || m.image || '';
+          return Object.assign({}, p, { imageUrl: imageUrl, hook: m.hook || '' });
+        });
       });
-      Promise.all(oembed).then(function(postsWithImages) {
-        renderPostCards(postsWithImages, 'mwi-feed', false);
+      Promise.all(enriched).then(function(postsEnriched) {
+        renderPostCards(postsEnriched, 'mwi-feed', false);
       });
     })
     .catch(function() {

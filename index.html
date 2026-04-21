@@ -561,8 +561,11 @@ canvas#world { display: block; width: 100%; height: 100%; image-rendering: pixel
 
       <!-- MWI LINKEDIN FEED -->
       <div class="panel" style="padding:14px 16px 16px;margin-bottom:16px">
-        <div class="section-heading" style="margin-bottom:12px">LATEST FROM MWI</div>
-        <div id="mwi-feed" style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px">
+          <div class="section-heading" style="margin-bottom:0">LATEST FROM MWI</div>
+          <button id="mwi-toggle-btn" onclick="toggleMwiOlder()" style="display:none;font-family:inherit;font-size:11px;font-weight:800;color:var(--cream2);background:transparent;border:2px solid var(--border2);padding:5px 10px;cursor:pointer;letter-spacing:0.06em;white-space:nowrap">SHOW OLDER &#9662;</button>
+        </div>
+        <div id="mwi-feed" data-expanded="0" style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px">
           <div style="font-size:12px;color:var(--grey);grid-column:1/-1">Loading...</div>
         </div>
       </div>
@@ -2377,28 +2380,66 @@ function escapeHtml(str) {
     .replace(/'/g, '&#39;');
 }
 
+// LinkedIn serves a tiny generic branding graphic from static.licdn.com/aero-v1/sc/h/...
+// as og:image when the scraper hits a login wall (common for carousels). Treat those
+// URLs as "no image" so the card falls through to the NO IMAGE placeholder.
+function isUsableImageUrl(u) {
+  if (!u) return false;
+  if (/static\.licdn\.com\/aero-v1\/sc\/h\//.test(u)) return false;
+  return true;
+}
+
+// onerror fallback: if the thumbnail URL 404s or CORS-fails at render time,
+// swap the image wrapper for the NO IMAGE placeholder so we never show a broken icon.
+window.handleMwiImgError = function(img) {
+  var wrap = img && img.parentElement;
+  if (!wrap) return;
+  wrap.outerHTML = '<div style="aspect-ratio:16/10;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-shrink:0;border-bottom:2px solid var(--border2)"><div style="font-size:11px;font-weight:700;color:var(--grey);letter-spacing:0.08em">NO IMAGE</div></div>';
+};
+
+// Toggle older MWI posts in/out. Cards beyond the first 3 are rendered with
+// data-mwi-older="1" and display:none by default; this flips them + the button label.
+function toggleMwiOlder() {
+  var feed = document.getElementById('mwi-feed');
+  var btn  = document.getElementById('mwi-toggle-btn');
+  if (!feed || !btn) return;
+  var expanded = feed.getAttribute('data-expanded') === '1';
+  var older = feed.querySelectorAll('[data-mwi-older="1"]');
+  older.forEach(function(el) { el.style.display = expanded ? 'none' : 'flex'; });
+  feed.setAttribute('data-expanded', expanded ? '0' : '1');
+  btn.innerHTML = expanded ? 'SHOW OLDER &#9662;' : 'HIDE OLDER &#9652;';
+}
+
 function renderPostCards(posts, containerId, showPerson) {
   var el = document.getElementById(containerId);
   if (!el) return;
   if (!posts || !posts.length) {
     el.innerHTML = '<div style="font-size:12px;color:var(--grey);padding:8px 0;grid-column:1/-1">No posts yet. Hit &ldquo;+ MWI POST&rdquo; to add one.</div>';
+    var btnEmpty = document.getElementById('mwi-toggle-btn');
+    if (btnEmpty) btnEmpty.style.display = 'none';
     return;
   }
   el.innerHTML = '';
-  posts.forEach(function(p) {
+  var VISIBLE_MAX = 3;
+  posts.forEach(function(p, i) {
     var dateStr = p.date ? new Date(p.date).toLocaleDateString('en-GB', {day:'numeric', month:'short'}).toUpperCase() : '';
     var card = document.createElement('div');
     // align-self:start lets each card size to its own image aspect so a square
     // single-image post and a wider carousel can sit side by side cleanly.
     card.style.cssText = 'background:var(--panel2);border:2px solid var(--border2);overflow:hidden;display:flex;flex-direction:column;box-shadow:2px 2px 0 var(--border2);align-self:start';
+    // Hide cards past the first 3. Toggle button (see toggleMwiOlder) flips them back on.
+    if (containerId === 'mwi-feed' && i >= VISIBLE_MAX) {
+      card.setAttribute('data-mwi-older', '1');
+      card.style.display = 'none';
+    }
 
     // Image renders at whatever native aspect LinkedIn serves for the thumbnail,
     // so single-image posts come through roughly square and carousels come through
     // wider. No forced aspect ratio, no crop.
     var imageHtml;
-    if (p.imageUrl) {
+    if (isUsableImageUrl(p.imageUrl)) {
       imageHtml = '<div style="overflow:hidden;flex-shrink:0;background:var(--bg)">'
-        + '<img src="' + escapeHtml(p.imageUrl) + '" alt="" style="width:100%;height:auto;display:block" loading="lazy">'
+        + '<img src="' + escapeHtml(p.imageUrl) + '" alt="" style="width:100%;height:auto;display:block" loading="lazy" onerror="handleMwiImgError(this)">'
         + '</div>';
     } else {
       imageHtml = '<div style="aspect-ratio:16/10;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-shrink:0;border-bottom:2px solid var(--border2)">'
@@ -2427,6 +2468,21 @@ function renderPostCards(posts, containerId, showPerson) {
     card.innerHTML = imageHtml + bodyHtml;
     el.appendChild(card);
   });
+
+  // Show the SHOW OLDER button only when there are more than 3 MWI posts.
+  // Reset state on every render so re-renders don't leave a stale label.
+  if (containerId === 'mwi-feed') {
+    var btn = document.getElementById('mwi-toggle-btn');
+    if (btn) {
+      if (posts.length > VISIBLE_MAX) {
+        btn.style.display = 'inline-block';
+        btn.innerHTML = 'SHOW OLDER &#9662;';
+        el.setAttribute('data-expanded', '0');
+      } else {
+        btn.style.display = 'none';
+      }
+    }
+  }
 }
 
 function loadCompanyFeed() {

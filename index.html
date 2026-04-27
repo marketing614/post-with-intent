@@ -313,21 +313,12 @@ canvas#world { display: block; width: 100%; height: 100%; image-rendering: pixel
   font-size: 14px; font-weight: 700; color: var(--cream);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.lb-stage {
-  font-size: 13px; color: var(--cream2);
-  margin-top: 2px;
-}
 .lb-pts {
   font-family: 'Inter', sans-serif;
   font-size: 14px; font-weight: 700; color: var(--gold);
   flex-shrink: 0; min-width: 28px; text-align: right;
 }
-.lb-bar-wrap { width: 40px; flex-shrink: 0; }
-.lb-bar {
-  height: 6px; background: var(--bg);
-  border: 1px solid var(--border2);
-}
-.lb-fill { height: 100%; }
+
 
 /* ── STARTING GRID (no posts) ── */
 .starting-row {
@@ -429,13 +420,7 @@ canvas#world { display: block; width: 100%; height: 100%; image-rendering: pixel
   border-color: var(--green);
   color: var(--green);
 }
-.bingo-cell.done::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath fill='%234ecb71' d='M7 14.2L2.8 10 1.4 11.4 7 17 19 5 17.6 3.6z'/%3E%3C/svg%3E") no-repeat center/14px;
-  opacity: 0.6;
-}
+
 .bingo-cell.free {
   background: rgba(244,196,48,0.15);
   border-color: var(--gold);
@@ -563,7 +548,7 @@ canvas#world { display: block; width: 100%; height: 100%; image-rendering: pixel
         <div style="font-size:10px;font-weight:800;color:var(--cream);margin-top:6px;letter-spacing:0.08em;">POSTS PUBLISHED</div>
         <div class="score-divider">
           <div style="font-size:14px;font-weight:900;color:var(--blue);text-shadow:1px 1px 0 #1a3a7a;line-height:1;">+<span id="follower-gain">0</span></div>
-          <div style="font-size:9px;font-weight:700;color:var(--cream2);margin-top:3px;letter-spacing:0.06em;">FOLLOWER GAIN</div>
+          <div style="font-size:9px;font-weight:700;color:var(--cream2);margin-top:3px;letter-spacing:0.06em;">FOLLOWER GAIN <span style="color:var(--grey)">/ 35 GOAL</span></div>
           <div style="font-size:11px;font-weight:700;color:var(--coral);margin-top:6px;"><span id="s-remain">0</span> TO CLOSE THE GAP</div>
         </div>
       </div>
@@ -628,13 +613,6 @@ canvas#world { display: block; width: 100%; height: 100%; image-rendering: pixel
       </div>
       <button class="px-x" onclick="closeM('skills-modal')">CLOSE</button>
     </div>
-    <a href="marketing-granola-post-ideas.skill" download="marketing-granola-post-ideas.skill" style="display:flex;align-items:center;gap:12px;width:100%;padding:14px 16px;margin-bottom:10px;background:var(--panel2);border:2px solid var(--border2);color:var(--cream);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;text-align:left;text-decoration:none;box-shadow:2px 2px 0 rgba(0,0,0,0.3);">
-      <span style="font-size:18px;flex-shrink:0">⬇</span>
-      <span>
-        <span style="font-size:13px;font-weight:800;color:var(--gold);display:block;margin-bottom:2px;">DOWNLOAD SKILL</span>
-        <span style="font-size:11px;color:var(--cream2);font-weight:400;">Granola Post Ideas — pulls LinkedIn post angles from your meeting notes</span>
-      </span>
-    </a>
     <button onclick="copyIdentityScript()" style="display:flex;align-items:center;gap:12px;width:100%;padding:14px 16px;margin-bottom:10px;background:var(--panel2);border:2px solid var(--border2);color:var(--cream);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;text-align:left;box-shadow:2px 2px 0 rgba(0,0,0,0.3);">
       <span style="font-size:18px;flex-shrink:0">📋</span>
       <span>
@@ -642,6 +620,13 @@ canvas#world { display: block; width: 100%; height: 100%; image-rendering: pixel
         <span style="font-size:11px;color:var(--cream2);font-weight:400;">Paste into a new Claude chat to discover your personal LinkedIn voice and posting pillars</span>
       </span>
     </button>
+    <a href="marketing-granola-post-ideas.skill" download="marketing-granola-post-ideas.skill" style="display:flex;align-items:center;gap:12px;width:100%;padding:14px 16px;margin-bottom:10px;background:var(--panel2);border:2px solid var(--border2);color:var(--cream);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;text-align:left;text-decoration:none;box-shadow:2px 2px 0 rgba(0,0,0,0.3);">
+      <span style="font-size:18px;flex-shrink:0">⬇</span>
+      <span>
+        <span style="font-size:13px;font-weight:800;color:var(--gold);display:block;margin-bottom:2px;">GRANOLA INSIGHTS CONTENT SKILL</span>
+        <span style="font-size:11px;color:var(--cream2);font-weight:400;">Pulls LinkedIn post angles from your Granola meeting notes</span>
+      </span>
+    </a>
     <div id="skills-copy-confirm" style="display:none;font-size:11px;font-weight:700;color:var(--green);text-align:center;margin-top:4px;">Copied to clipboard!</div>
   </div>
 </div>
@@ -739,7 +724,9 @@ var TEAM = [
   {n:'Sara',    full:'Sara',            c:'#f4c430', p:0, s:'building', posted:false, followers:1282},
   {n:'Jon',     full:'Jon',          c:'#5b8dd9', p:0, s:'building', posted:false, followers:707},
   {n:'Charley', full:'Charley',         c:'#4ecb71', p:0, s:'building', posted:false, followers:1486},
-  {n:'Dan',     full:'Dan',                  c:'#9b59b6', p:0, s:'building', posted:false, followers:1788}
+  {n:'Dan',     full:'Dan',                  c:'#9b59b6', p:0, s:'building', posted:false, followers:1788},
+  {n:'ABC',     full:'ABC',                  c:'#e05c5c', p:0, s:'building', posted:false, followers:0},
+  {n:'123',     full:'123',                  c:'#5b8dd9', p:0, s:'building', posted:false, followers:0}
 ];
 
 var TP = 0;
@@ -921,7 +908,7 @@ function drawWorld() {
   // Smooth sine-based bob so he gently floats up and down
   josepY = Math.sin(frameCount * 0.04) * 2;
 
-  var josepX  = 130;
+  var josepX  = Math.round(W * 0.38);
   var groundBase = groundY - 4;
   var by = groundBase - 36 + Math.round(josepY);
 
@@ -1117,15 +1104,21 @@ function drawWorld() {
   // ── SPEECH BUBBLE — always ABOVE Josep, tail points DOWN toward his head ──
   if (josepState === 'showing') {
     var saying = josepCurrentSaying;
-    ctx.font = '700 12px Inter, sans-serif';
+    ctx.font = '700 15px Inter, sans-serif';
     var catWidth = ctx.measureText(saying.cat).width;
-    ctx.font = '400 11px Inter, sans-serif';
+    ctx.font = '400 13px Inter, sans-serif';
     var enWidth  = ctx.measureText('(' + saying.en + ')').width;
-    var bubW = Math.max(catWidth, enWidth) + 24;
-    var bubH = 46;
-    // Centre bubble above his head, clamped to canvas edges
-    var headCenterX = josepX + 20 + 7;
+    var bubW = Math.max(catWidth, enWidth) + 28;
+    var bubH = 52;
+    // Centre bubble above his head
+    var headCenterX = josepX + 27;
     var bubX = Math.round(headCenterX - bubW / 2);
+    // Never overlap flag (flag right edge ≈ josepX - 80 + 55 = josepX - 25)
+    var flagRightEdge = josepX - 25;
+    bubX = Math.max(flagRightEdge + 10, bubX);
+    // Never overlap Josep body (body starts at josepX)
+    if (bubX + bubW > josepX + 50) bubX = Math.min(bubX, josepX - 10);
+    // Clamp to canvas edges
     bubX = Math.max(8, Math.min(bubX, W - bubW - 8));
     // Position well above ears (ears top at by-10)
     var bubY = by - 10 - bubH - 22;
@@ -1154,12 +1147,12 @@ function drawWorld() {
 
     // Text
     ctx.fillStyle = '#2d2b55';
-    ctx.font = '700 12px Inter, sans-serif';
+    ctx.font = '700 15px Inter, sans-serif';
     ctx.textBaseline = 'middle';
-    ctx.fillText(saying.cat, bubX + 11, bubY + 16);
+    ctx.fillText(saying.cat, bubX + 12, bubY + 18);
     ctx.fillStyle = '#6a5a8a';
-    ctx.font = '400 11px Inter, sans-serif';
-    ctx.fillText('(' + saying.en + ')', bubX + 11, bubY + 32);
+    ctx.font = '400 13px Inter, sans-serif';
+    ctx.fillText('(' + saying.en + ')', bubX + 12, bubY + 36);
     ctx.textBaseline = 'alphabetic';
   }
 
@@ -1220,7 +1213,9 @@ var BINGO_SQUARES = [
   {id:'basket-browse',    label:'Use case: Basket vs. Browse Abandonment',   done:false}
 ];
 
-var bingoState = JSON.parse(localStorage.getItem('pwi_bingo') || '{}');
+var BINGO_SEASON = 'round-2';
+var _stored = JSON.parse(localStorage.getItem('pwi_bingo') || '{}');
+var bingoState = (_stored.__season === BINGO_SEASON) ? _stored : { __season: BINGO_SEASON };
 
 
 // ── POST LOGGING ─────────────────────────────────────────────────────────────
@@ -1424,9 +1419,7 @@ function renderLB() {
       + '<div class="lb-rank '+rankClass+'">'+String(i+1)+'</div>'
       + '<div class="lb-info">'
         + '<div class="lb-name">'+t.n+(you?' (YOU)':'')+'</div>'
-        + '<div class="lb-stage" style="color:'+scolor(t.s)+'">'+slbl(t.s)+'</div>'
       + '</div>'
-      + '<div class="lb-bar-wrap"><div class="lb-bar"><div class="lb-fill" style="width:'+barPct+'%;background:'+barColor+'"></div></div></div>'
       + '<div class="lb-pts">'+t.p+'</div>'
       + '</div>';
   });

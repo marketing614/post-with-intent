@@ -1380,6 +1380,7 @@ function checkBingoWin() {
   if ([0,1,2,3,4].every(function(i){ return grid[i][i]; })) won = true;
   if ([0,1,2,3,4].every(function(i){ return grid[i][4-i]; })) won = true;
   if (won) showToast('BINGO! LINE COMPLETE!');
+  return won;
 }
 
 
@@ -2106,21 +2107,24 @@ function submitLogPost() {
   renderLogHistory();
   showToast('+1 POINT LOGGED');
 
-  // If this log came from a bingo square, mark that square as claimed
+  // If this log came from a bingo square, mark it claimed and check for a completed line.
+  // bingoCompleted is captured BEFORE clearing activeBingoSquare so the worker knows.
+  var bingoCompleted = false;
   if (activeBingoSquare) {
     bingoState[activeBingoSquare] = true;
     localStorage.setItem('pwi_bingo', JSON.stringify(bingoState));
     activeBingoSquare = null;
     renderBingo();
-    checkBingoWin();
+    bingoCompleted = checkBingoWin(); // returns true if a line is now complete
   }
 
-  // Save to Notion via Cloudflare so the point persists after refresh
+  // Save to Notion via Cloudflare so the point persists after refresh.
+  // bingoCompleted tells the worker to fire the Bingo Slack notification.
   var today = new Date().toISOString().split('T')[0];
   fetch('https://post-with-intent-proxy.sara-690.workers.dev/api/log-post', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ person: me.n, linkedinUrl: url, date: today, openingLine: openingLine })
+    body: JSON.stringify({ person: me.n, linkedinUrl: url, date: today, openingLine: openingLine, bingoCompleted: bingoCompleted })
   }).catch(function(e) { console.error('Failed to save to Notion', e); });
 }
 

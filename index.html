@@ -94,11 +94,44 @@ html {
 /* ── PAGE ── */
 .page { max-width: 1200px; margin: 0 auto; padding: 20px 16px 80px; }
 
+/* ── TOP SECTION: world canvas + right panel ── */
+.top-section {
+  display: grid;
+  grid-template-columns: 1fr 230px;
+  gap: 14px;
+  margin-bottom: 20px;
+  align-items: stretch;
+}
+.right-col { display: flex; flex-direction: column; gap: 10px; }
+.skills-btn {
+  padding: 10px 12px; text-align: center; cursor: pointer;
+  transition: transform 0.05s, box-shadow 0.05s;
+}
+.skills-btn:hover { transform: translate(1px,1px); box-shadow: 2px 2px 0 var(--border2); }
+.skills-btn-label {
+  font-size: 12px; font-weight: 900; color: var(--gold);
+  letter-spacing: 0.06em; text-shadow: 1px 1px 0 #7a5a00;
+}
+.score-panel {
+  padding: 14px; text-align: center;
+  flex: 1; display: flex; flex-direction: column; justify-content: center;
+}
+.score-divider { margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--border2); }
+.log-btn-big {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px; font-weight: 900;
+  background: var(--green); color: var(--bg);
+  border: none; padding: 12px; width: 100%;
+  text-align: center; cursor: pointer;
+  box-shadow: 0 4px 0 var(--green-d); letter-spacing: 0.04em;
+  transition: transform 0.05s, box-shadow 0.05s;
+}
+.log-btn-big:hover { transform: translateY(2px); box-shadow: 0 2px 0 var(--green-d); }
+
 /* ── WORLD SCENE (Blobby + environment) ── */
 .world-card {
   position: relative; overflow: hidden;
-  margin-bottom: 24px;
-  height: 220px;
+  height: 280px;
 }
 .world-canvas-wrap {
   position: absolute; inset: 0;
@@ -381,7 +414,7 @@ canvas#world { display: block; width: 100%; height: 100%; image-rendering: pixel
   display: flex; align-items: center; justify-content: center;
   text-align: center;
   font-family: 'Inter', sans-serif;
-  font-size: 13px; font-weight: 600; line-height: 1.3;
+  font-size: 15px; font-weight: 600; line-height: 1.3;
   color: var(--cream2);
   background: var(--bg);
   border: 2px solid var(--border2);
@@ -493,51 +526,56 @@ canvas#world { display: block; width: 100%; height: 100%; image-rendering: pixel
       <div class="live-dot-wrap"><div class="live-dot"></div>LIVE</div>
       <button class="user-btn" id="u-btn" onclick="openWho()">ADD YOUR NAME</button>
       <button class="user-btn" onclick="openRules()" style="color:var(--cream2)">RULES &amp; INFO</button>
-      <button class="user-btn" onclick="openM('voice-modal')" style="color:var(--blue)">SET UP YOUR VOICE</button>
       <button class="user-btn" onclick="loadPostsFromNotion()" style="color:var(--cream2)" title="Refresh scores from Notion">REFRESH</button>
     <button id="mwi-post-btn" style="display:none;font-family:inherit;font-size:13px;font-weight:700;color:var(--gold);background:var(--panel2);border:2px solid var(--gold);padding:6px 14px;cursor:pointer;box-shadow:2px 2px 0 #7a5a00" onclick="openLogCompanyPost()">+ MWI POST</button>
-    <button class="user-btn" onclick="openLogPost()" style="background:var(--green);color:var(--bg);font-weight:800;border:none;padding:6px 14px;cursor:pointer">+ LOG POST</button>
     </div>
   </div>
 </nav>
 
 <div class="page">
 
-  <!-- WORLD SCENE: Blobby + environment -->
-  <div class="world-card panel" style="margin-bottom:20px">
-    <div class="world-canvas-wrap">
-      <canvas id="world"></canvas>
-    </div>
-    <div class="world-overlay" style="display:flex;flex-direction:column;justify-content:space-between;align-items:stretch;padding:12px 16px 14px;pointer-events:none">
-      <!-- stats top-right -->
-      <div style="display:flex;justify-content:flex-end">
-        <div style="display:flex;gap:8px;align-items:stretch">
-          <!-- followers (left) -->
-          <div class="world-score-box" style="display:flex;flex-direction:column;justify-content:center;min-width:90px;text-align:center">
-            <div style="font-family:Inter,sans-serif;font-size:18px;font-weight:900;color:var(--blue);text-shadow:1px 1px 0 #1a3a7a;line-height:1">+<span id="follower-gain">0</span></div>
-            <div style="font-family:Inter,sans-serif;font-size:10px;font-weight:600;color:var(--cream2);margin-top:5px;letter-spacing:0.04em">FOLLOWER GAIN</div>
-            <div style="font-family:Inter,sans-serif;font-size:9px;font-weight:600;color:var(--blue);margin-top:3px">NO TARGET YET</div>
-          </div>
-          <!-- posts count (right, big) -->
-          <div class="world-score-box" style="text-align:right">
-            <div style="font-family:Inter,sans-serif;font-size:44px;font-weight:900;color:var(--gold);text-shadow:3px 3px 0 #7a5a00;line-height:1;letter-spacing:-0.02em"><span id="hn">0</span><span style="font-size:20px;color:var(--cream2)">/35</span></div>
-            <div style="font-family:Inter,sans-serif;font-size:11px;font-weight:600;color:var(--cream2);margin-top:8px;letter-spacing:0.04em">POSTS PUBLISHED</div>
-            <div style="font-family:Inter,sans-serif;font-size:11px;font-weight:600;color:var(--coral);margin-top:4px"><span id="s-remain">0</span> TO CLOSE THE GAP</div>
-          </div>
+  <!-- TOP SECTION: world canvas + right panel -->
+  <div class="top-section">
+
+    <!-- WORLD SCENE -->
+    <div class="world-card panel">
+      <div class="world-canvas-wrap">
+        <canvas id="world"></canvas>
+      </div>
+      <!-- Posted this week names in grass -->
+      <div class="world-overlay" style="display:flex;flex-direction:column;justify-content:flex-end;align-items:stretch;padding:10px 14px 12px;pointer-events:none">
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <div style="font-family:Inter,sans-serif;font-size:9px;font-weight:700;color:rgba(244,232,193,0.5);letter-spacing:0.12em;text-transform:uppercase">Posted this week</div>
+          <div id="world-names" style="display:flex;gap:6px;flex-wrap:wrap;align-items:flex-end"></div>
         </div>
       </div>
-      <!-- names in grass bottom -->
-      <div style="display:flex;flex-direction:column;gap:5px">
-        <div style="font-family:Inter,sans-serif;font-size:9px;font-weight:700;color:rgba(244,232,193,0.5);letter-spacing:0.12em;text-transform:uppercase">Posted this week</div>
-        <div id="world-names" style="display:flex;gap:6px;flex-wrap:wrap;align-items:flex-end"></div>
-      </div>
     </div>
-  </div>
+
+    <!-- RIGHT PANEL: Claude Skills + score + log post -->
+    <div class="right-col">
+      <div class="skills-btn panel" onclick="openM('skills-modal')">
+        <div class="skills-btn-label">CLAUDE SKILLS</div>
+      </div>
+      <div class="score-panel panel">
+        <div>
+          <span style="font-size:44px;font-weight:900;color:var(--gold);text-shadow:2px 2px 0 #7a5a00;line-height:1;letter-spacing:-0.02em"><span id="hn">0</span></span><span style="font-size:20px;font-weight:900;color:var(--cream2)">/15</span>
+        </div>
+        <div style="font-size:10px;font-weight:800;color:var(--cream);margin-top:6px;letter-spacing:0.08em;">POSTS PUBLISHED</div>
+        <div class="score-divider">
+          <div style="font-size:14px;font-weight:900;color:var(--blue);text-shadow:1px 1px 0 #1a3a7a;line-height:1;">+<span id="follower-gain">0</span></div>
+          <div style="font-size:9px;font-weight:700;color:var(--cream2);margin-top:3px;letter-spacing:0.06em;">FOLLOWER GAIN</div>
+          <div style="font-size:11px;font-weight:700;color:var(--coral);margin-top:6px;"><span id="s-remain">0</span> TO CLOSE THE GAP</div>
+        </div>
+      </div>
+      <button class="log-btn-big" onclick="openLogPost()">+ LOG A POST</button>
+    </div>
+
+  </div><!-- /top-section -->
 
   <!-- PROGRESS BAR + MILESTONES -->
   <div class="progress-card panel" style="margin-bottom:20px">
     <div class="progress-label">
-      <span>TEAM PROGRESS — 35 POSTS</span>
+      <span>TEAM PROGRESS — 15 POSTS</span>
       <span style="color:var(--gold)" id="prog-pct">0%</span>
     </div>
     <div class="progress-track">
@@ -545,11 +583,11 @@ canvas#world { display: block; width: 100%; height: 100%; image-rendering: pixel
     </div>
     <div class="milestone-markers">
       <div class="mm hit" id="mm-start"><span>START</span></div>
-      <div class="mm far" id="mm-6"><span>6</span></div>
-      <div class="mm far" id="mm-18"><span>12</span></div>
-      <div class="mm far" id="mm-30"><span>18</span></div>
-      <div class="mm far" id="mm-54"><span>25</span></div>
-      <div class="mm far" id="mm-100"><span>35</span></div>
+      <div class="mm far" id="mm-6"><span>3</span></div>
+      <div class="mm far" id="mm-18"><span>6</span></div>
+      <div class="mm far" id="mm-30"><span>9</span></div>
+      <div class="mm far" id="mm-54"><span>12</span></div>
+      <div class="mm far" id="mm-100"><span>15</span></div>
     </div>
   </div>
 
@@ -559,29 +597,10 @@ canvas#world { display: block; width: 100%; height: 100%; image-rendering: pixel
     <!-- LEFT COL -->
     <div>
 
-      <!-- MWI LINKEDIN FEED -->
-      <div class="panel" style="padding:14px 16px 16px;margin-bottom:16px">
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px">
-          <div class="section-heading" style="margin-bottom:0">LATEST FROM MWI</div>
-          <button id="mwi-toggle-btn" onclick="toggleMwiOlder()" style="display:none;font-family:inherit;font-size:11px;font-weight:800;color:var(--cream2);background:transparent;border:2px solid var(--border2);padding:5px 10px;cursor:pointer;letter-spacing:0.06em;white-space:nowrap">SHOW OLDER</button>
-        </div>
-        <div id="mwi-feed" data-expanded="0" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
-          <div style="font-size:12px;color:var(--grey);grid-column:1/-1">Loading...</div>
-        </div>
-      </div>
-
-      <!-- WHO POSTED — now shown as names in the world canvas grass -->
-
-      <!-- BINGO — locked teaser -->
-      <div class="panel" style="padding:18px 20px;position:relative;overflow:hidden">
+      <!-- BINGO -->
+      <div class="panel" style="padding:18px 20px;">
         <div class="section-heading" style="margin-bottom:14px">BINGO BOARD</div>
         <div id="bingo-grid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:5px;"></div>
-        <div id="bingo-lock-overlay" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:rgba(26,28,44,0.7);backdrop-filter:blur(3px);z-index:2;">
-          <div style="font-size:13px;font-weight:900;letter-spacing:0.18em;color:var(--gold);padding:6px 14px;border:2px solid var(--gold)">LOCKED</div>
-          <div style="font-size:13px;font-weight:800;color:var(--cream);text-align:center;line-height:1.5;max-width:200px">Unlocks when everyone makes their first post</div>
-          <div id="bingo-unlock-status" style="font-size:11px;color:var(--cream2);text-align:center"></div>
-          <div style="font-size:11px;color:var(--grey);text-align:center;max-width:180px;line-height:1.5">Topics, format challenges, and a FREE space in the middle</div>
-        </div>
       </div>
 
     </div>
@@ -598,6 +617,34 @@ canvas#world { display: block; width: 100%; height: 100%; image-rendering: pixel
   </div>
 </div>
 
+
+<!-- CLAUDE SKILLS MODAL -->
+<div class="modal-bg" id="skills-modal" onclick="bgC(event,'skills-modal')">
+  <div class="rules-box" style="max-width:460px">
+    <div class="rules-hrow">
+      <div>
+        <div class="rules-title" style="font-size:20px">CLAUDE SKILLS</div>
+        <div class="rules-sub">Tools to help you post better, faster.</div>
+      </div>
+      <button class="px-x" onclick="closeM('skills-modal')">CLOSE</button>
+    </div>
+    <a href="marketing-granola-post-ideas.skill" download="marketing-granola-post-ideas.skill" style="display:flex;align-items:center;gap:12px;width:100%;padding:14px 16px;margin-bottom:10px;background:var(--panel2);border:2px solid var(--border2);color:var(--cream);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;text-align:left;text-decoration:none;box-shadow:2px 2px 0 rgba(0,0,0,0.3);">
+      <span style="font-size:18px;flex-shrink:0">⬇</span>
+      <span>
+        <span style="font-size:13px;font-weight:800;color:var(--gold);display:block;margin-bottom:2px;">DOWNLOAD SKILL</span>
+        <span style="font-size:11px;color:var(--cream2);font-weight:400;">Granola Post Ideas — pulls LinkedIn post angles from your meeting notes</span>
+      </span>
+    </a>
+    <button onclick="copyIdentityScript()" style="display:flex;align-items:center;gap:12px;width:100%;padding:14px 16px;margin-bottom:10px;background:var(--panel2);border:2px solid var(--border2);color:var(--cream);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;text-align:left;box-shadow:2px 2px 0 rgba(0,0,0,0.3);">
+      <span style="font-size:18px;flex-shrink:0">📋</span>
+      <span>
+        <span style="font-size:13px;font-weight:800;color:var(--gold);display:block;margin-bottom:2px;">COPY IDENTITY INTERVIEW SCRIPT</span>
+        <span style="font-size:11px;color:var(--cream2);font-weight:400;">Paste into a new Claude chat to discover your personal LinkedIn voice and posting pillars</span>
+      </span>
+    </button>
+    <div id="skills-copy-confirm" style="display:none;font-size:11px;font-weight:700;color:var(--green);text-align:center;margin-top:4px;">Copied to clipboard!</div>
+  </div>
+</div>
 
 <!-- LOG POST MODAL -->
 <div class="modal-bg" id="log-modal" onclick="bgC(event,'log-modal')">
@@ -684,95 +731,6 @@ canvas#world { display: block; width: 100%; height: 100%; image-rendering: pixel
   </div>
 </div>
 
-<!-- VOICE SETUP MODAL -->
-<div class="modal-bg" id="voice-modal" onclick="bgC(event,'voice-modal')">
-  <div class="rules-box" style="max-width:560px">
-    <div class="rules-hrow">
-      <div>
-        <div class="rules-title" style="font-size:20px">FIND YOUR VOICE ON LINKEDIN</div>
-        <div class="rules-sub">A short interview that figures out how you actually communicate — and turns it into your personal posting style.</div>
-      </div>
-      <button class="px-x" onclick="closeM('voice-modal')">CLOSE</button>
-    </div>
-
-    <div style="margin-bottom:20px">
-      <div style="font-size:12px;font-weight:700;color:var(--cream2);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px">HOW IT WORKS</div>
-      <div style="font-size:14px;color:var(--cream);line-height:1.75">
-        <div style="display:flex;gap:10px;margin-bottom:8px"><span style="color:var(--gold);font-weight:800;flex-shrink:0">1.</span> Copy the script below</div>
-        <div style="display:flex;gap:10px;margin-bottom:8px"><span style="color:var(--gold);font-weight:800;flex-shrink:0">2.</span> Open a new Cowork chat and paste it in</div>
-        <div style="display:flex;gap:10px;margin-bottom:8px"><span style="color:var(--gold);font-weight:800;flex-shrink:0">3.</span> Run the interview — it takes about 10 minutes</div>
-        <div style="display:flex;gap:10px"><span style="color:var(--gold);font-weight:800;flex-shrink:0">4.</span> Save the voice profile it gives you. That's what powers your posts.</div>
-      </div>
-    </div>
-
-    <div style="margin-bottom:20px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-        <div style="font-size:12px;font-weight:700;color:var(--cream2);text-transform:uppercase;letter-spacing:0.08em">THE SCRIPT</div>
-        <button onclick="copyVoiceScript()" style="font-family:inherit;font-size:12px;font-weight:700;color:var(--bg);background:var(--gold);border:none;padding:6px 14px;cursor:pointer;box-shadow:0 2px 0 #9a7a00" id="voice-copy-btn">COPY SCRIPT</button>
-      </div>
-      <div style="background:var(--bg);border:2px solid var(--border2);padding:14px 16px;max-height:220px;overflow-y:auto;font-size:12px;color:var(--cream2);line-height:1.8;white-space:pre-wrap;font-family:monospace" id="voice-script-preview">You're running a LinkedIn identity interview with me.
-The goal is to help me figure out my personal voice and what I actually stand for on LinkedIn — not what the company wants, but what's genuinely mine. This will shape the topics I post about and how I write.
-Run this as a real conversation. One question at a time. Wait for my answer. React to what I say — if something is interesting, go deeper. If something is vague, push me to be more specific. Keep it human, not like a form.
-We have four short phases. At the end, give me:
-1. A voice profile — 3-4 sentences describing how I actually communicate, based on what I said
-2. 3-4 personal posting pillars — topics that are genuinely mine, each with a one-line explanation of why it works for me and what kind of post it leads to (a client win, a personal take, a timely observation, a story)
-3. One post prompt — something specific I said that could become a real post this week, written as a prompt I can work from right now
----
-Start here, in your own words:
-"Before we get into work — who are you outside your job? What do you actually spend time on, follow obsessively, or care about that has nothing to do with your role?"
-Then move through these phases naturally. Don't read the questions out. Adapt based on what I say.
-PHASE 1 — Who you are (not your job title)
-- What do you consume? Sport, podcasts, shows, games, creators, communities
-- How do you communicate with people — are you the one who tells the long story, drops the one-liner, or asks all the questions?
-- What could you talk about for an hour without preparing anything?
-- What do you believe that most people in your industry would push back on?
-PHASE 2 — Your work, honestly
-- What do you actually do day to day — and what part of it shows up in your head outside of work hours?
-- What's something that worked recently that you're quietly proud of?
-- What do you wish more people understood about what you do or the space you work in?
-- What would make you cringe about your own post — what's the version of you on LinkedIn you'd be embarrassed by?
-PHASE 3 — Your LinkedIn why
-- Who are you actually trying to reach — or who would you want to stumble across your posts?
-- If someone read 10 of your posts, what would you want them to think about you?
-- What's actually stopping you from posting more — be honest, not polished
-PHASE 4 — This week
-- What's one thing that happened at work this week — a conversation, a result, something that surprised you, anything
-- What's something you noticed recently — inside or outside work — that made you think "that's interesting"
----
-Once you have my answers, synthesise and give me my voice profile, pillars, and one ready-to-use post prompt. Be specific. Reference what I actually said. No generic LinkedIn advice.</div>
-    </div>
-
-    <div style="border-top:2px solid var(--border2);padding-top:16px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-        <div style="font-size:12px;font-weight:700;color:var(--cream2);text-transform:uppercase;letter-spacing:0.08em">STEP 2: POST-WRITING SCRIPT</div>
-        <button onclick="copyPostScript()" style="font-family:inherit;font-size:12px;font-weight:700;color:var(--bg);background:var(--gold);border:none;padding:6px 14px;cursor:pointer;box-shadow:0 2px 0 #9a7a00" id="post-copy-btn">COPY PASTE POST WRITING SKILL</button>
-      </div>
-      <div style="font-size:13px;color:var(--cream2);line-height:1.65;margin-bottom:10px">Once you have your voice profile, open a new Cowork chat, paste this in, and follow the prompts to write your post.</div>
-      <div style="background:var(--bg);border:2px solid var(--border2);padding:14px 16px;max-height:180px;overflow-y:auto;font-size:12px;color:var(--cream2);line-height:1.8;white-space:pre-wrap;font-family:monospace" id="post-script-preview">I've done my LinkedIn identity interview and I have my voice profile and posting pillars. I want to write a post.
-Here's my profile and pillars:
-[paste your output from the interview here]
-Your job is to help me write one post that sounds like me — not a LinkedIn template, not a list of lessons, not "Here's what I learned." Something real.
-Run this as a conversation. One question at a time.
-Start by asking me: "What's the thing from this week you keep thinking about — a conversation, a result, something that surprised you, or something you noticed?"
-Then ask follow-up questions to get the specific detail out:
-- Who was involved? What actually happened?
-- What did you think or feel in that moment?
-- What would you say about it to a colleague over lunch — not on LinkedIn, just to a person?
-- Is there a number, a quote, a before/after, or a single image that captures it?
-Once you have enough, write a first draft. Keep it short — under 200 words. One idea. No hook formula ("Here's the thing about X"). No bullet point lessons at the end. Write it the way they'd actually say it.
-Then ask: "Does this sound like you? What's off?"
-Iterate once or twice based on their feedback. Don't rewrite from scratch — adjust.
-After the final version, give the "good enough" signal:
-Check it against these four things and tell me the result:
-1. Does it sound like me, not like a generic LinkedIn voice?
-2. Is there one specific detail in it — a number, a moment, a name, a reaction?
-3. Is it making one point, not three?
-4. Would I be comfortable if my team, a client, or someone I respect saw this?
-If it passes all four, say: "This is ready. The version you write after another 20 minutes of editing won't perform better than this one. Post it."
-If something's off, tell me exactly what and fix it together.</div>
-    </div>
-  </div>
-</div>
 
 
 <script>
@@ -802,37 +760,33 @@ var me = null;
 
 
 // ── JOSEPS CATALAN SAYINGS ─────────────────────────────────────────────────────────
+// ── TEAM-SPIRIT SAYINGS — about the team, post ideas, shout-outs ──
 var CATALAN_SAYINGS = [
-  { cat: "Qui no s'arrisca, no pisca",        en: "Nothing ventured, nothing gained" },
-  { cat: "A poc a poc",                         en: "Little by little" },
-  { cat: "Bon dia!",                            en: "Good morning!" },
-  { cat: "Gràcies!",                            en: "Thank you!" },
-  { cat: "Bon profit!",                         en: "Enjoy your meal!" },
-  { cat: "Home de palla, dona de ferro",        en: "Man of straw, woman of iron" },
-  { cat: "Cada ovella amb la seva parella",     en: "Birds of a feather flock together" },
-  { cat: "Fins aviat!",                         en: "See you soon!" },
-  { cat: "No hi ha mal que per bé no vingui",  en: "Every cloud has a silver lining" },
-  { cat: "Qui dia passa, any empeny",           en: "Time flies whether you like it or not" },
-  { cat: "Molt bé!",                            en: "Very good!" },
-  { cat: "La set ve menjant",                   en: "Appetite comes with eating" },
-  { cat: "T'estimo",                            en: "I love you" },
-  { cat: "Déu n'hi do!",                        en: "Goodness gracious!" },
-  { cat: "A l'abril, aigues mil",               en: "April showers bring May flowers" },
-  { cat: "Val més tard que mai",                en: "Better late than never" },
-  { cat: "Ep!",                                 en: "Hey!" },
-  { cat: "Ostres!",                             en: "Wow / Good grief!" },
-  { cat: "Carai!",                              en: "Blimey!" },
-  { cat: "Vinga, va!",                          en: "Come on then!" },
-  { cat: "Ara o mai!",                          en: "Now or never!" },
-  { cat: "A beure!",                            en: "Cheers!" },
-  { cat: "Quina bona pinta!",                   en: "That looks delicious!" },
-  { cat: "Tant va el cànter a la font…",        en: "…that it ends up breaking" },
-  { cat: "No et perdis!",                       en: "Don't get lost!" },
-  { cat: "Aixo és molt maco",                   en: "This is very nice" },
-  { cat: "Qui vulgui peix que es mulli el cul", en: "No pain, no gain" },
-  { cat: "M'estimes?",                          en: "Do you love me?" },
-  { cat: "Quina vergonya!",                     en: "How embarrassing!" },
-  { cat: "L'home proposa i Déu disposa",        en: "Man proposes, God disposes" }
+  { cat: "L'equip va de meravella!",          en: "The team is absolutely flying!" },
+  { cat: "Idea: compartiu un client!",        en: "Post idea: share a client win!" },
+  { cat: "Qui publica avui?",                 en: "Who's posting today?" },
+  { cat: "Idea: un punt de dades!",           en: "Post idea: lead with a data point!" },
+  { cat: "Publiqueu sobre la intenció!",      en: "Post about intent — it's your thing!" },
+  { cat: "Idea: analogia de la vida real!",   en: "Post idea: use a real-life analogy!" },
+  { cat: "Teniu molt a explicar!",            en: "You have so many stories to tell!" },
+  { cat: "Idea: comenceu amb una pregunta!",  en: "Post idea: open with a question!" },
+  { cat: "Idea: compartiu un error!",         en: "Post idea: share what didn't work!" },
+  { cat: "Brew with Intent s'acosta!",        en: "Brew with Intent is coming up!" },
+  { cat: "Idea: 100 paraules o menys!",       en: "Post idea: say it in under 100 words!" },
+  { cat: "Seguiu publicant!",                 en: "Keep posting — you're nearly there!" },
+  { cat: "Idea: etapes del cicle de compra!", en: "Post idea: write about buying stages!" },
+  { cat: "L'equip MWI és increïble!",         en: "The MWI team is incredible!" },
+  { cat: "Idea: mostra la pantalla!",         en: "Post idea: share a screen recording!" },
+  { cat: "Sóc molt orgullós de l'equip!",     en: "I'm so proud of this team!" },
+  { cat: "Idea: una conclusió de trucada!",   en: "Post idea: one thing from a recent call!" },
+  { cat: "Vinga, va! Publiquem!",             en: "Come on then — let's post!" },
+  { cat: "Idea: per què compren?",            en: "Post idea: why do buyers buy?" },
+  { cat: "Idea: compartiu una intuïció!",     en: "Post idea: share a Granola insight!" },
+  { cat: "Cada post és un guany!",            en: "Every post is a win!" },
+  { cat: "Idea: mostra el producte!",         en: "Post idea: screenshot from the app!" },
+  { cat: "Qui lidera el tauler avui?",        en: "Who's leading the board today?" },
+  { cat: "Idea: el vostre 'per què'!",        en: "Post idea: share your why!" },
+  { cat: "Ara o mai. Publiqueu!",             en: "Now or never. Go post!" }
 ];
 
 // Timing: 5s showing (300 frames @ 60fps), 2s pause (120 frames), then next
@@ -844,10 +798,10 @@ var josepCurrentIdx   = 0;
 var josepCurrentSaying = CATALAN_SAYINGS[0];
 
 var JOSEP_INTROS = [
-  { cat: "Hola! Sóc en Josep.", en: "Hi! I'm Josep." },
-  { cat: "Em dic Josep!", en: "My name is Josep!" },
-  { cat: "Josep aquí! Bon dia!", en: "Josep here! Good day!" },
-  { cat: "Sóc en Josep. I tu?", en: "I'm Josep. And you?" }
+  { cat: "Hola! Sóc en Josep!",           en: "Hi! I'm Josep, your team mascot!" },
+  { cat: "Josep és aquí!",                en: "Josep is here to cheer you on!" },
+  { cat: "Bon dia, equip MWI!",           en: "Good day, MWI team!" },
+  { cat: "Sóc en Josep. Publiqueu!",      en: "I'm Josep. Now go post something!" }
 ];
 var josepSayingCount = 0;
 
@@ -904,17 +858,17 @@ function drawWorld() {
 
   var postedCount = TEAM.filter(function(t){ return t.posted; }).length;
   var ratio = postedCount / TEAM.length;
-  var teamRatio = Math.min(1, TP / 35);
+  var teamRatio = Math.min(1, TP / 15);
 
   // ── SKY ──
   var skyTop, skyBot;
   if      (ratio < 0.2) { skyTop = '#2a2a3a'; skyBot = '#1a1a28'; }
   else if (ratio < 0.7) { skyTop = '#1a3a6a'; skyBot = '#2a4a8a'; }
   else                  { skyTop = '#4a2a6a'; skyBot = '#8a3a4a'; }
-  var skyGrad = ctx.createLinearGradient(0, 0, 0, H * 0.65);
+  var skyGrad = ctx.createLinearGradient(0, 0, 0, H * 0.80);
   skyGrad.addColorStop(0, skyTop); skyGrad.addColorStop(1, skyBot);
   ctx.fillStyle = skyGrad;
-  ctx.fillRect(0, 0, W, H * 0.65);
+  ctx.fillRect(0, 0, W, H * 0.80);
 
   // ── CLOUDS (always drift, appear in all states) ──
   var cloudAlpha = ratio < 0.2 ? 0.5 : ratio < 0.7 ? 0.6 : 0.4;
@@ -922,48 +876,6 @@ function drawWorld() {
     var x = ((cl.baseX + frameCount * cl.speed) % (W + 80)) - 40;
     drawCloud(ctx, x, cl.y, cl.w, cl.h, cloudAlpha);
   });
-
-  // ── SUN (peeks down from top like Teletubbies, occasional cameo) ──
-  // Sun appears on a slow cycle: visible ~20% of the time, slides down then back up
-  var sunCycle = Math.sin(frameCount * 0.005);  // very slow
-  var sunVisible = sunCycle > 0.6;              // appears ~20% of time
-  var sunPeek = sunVisible ? Math.round((1 - (sunCycle - 0.6) / 0.4) * -8) + 4 : -48;
-  // sunPeek: -48 = fully hidden above, 4 = peeking down
-  var sunY = sunPeek;
-  if (ratio >= 0.2) {
-    // Sun face — round pixelated sun
-    ctx.fillStyle = '#ffe060';
-    ctx.fillRect(W/2 - 18, sunY, 36, 36);
-    // Face
-    ctx.fillStyle = '#f4a020';
-    ctx.fillRect(W/2 - 8, sunY + 10, 5, 5);  // left eye
-    ctx.fillRect(W/2 + 3, sunY + 10, 5, 5);  // right eye
-    ctx.fillRect(W/2 - 6, sunY + 22, 12, 4); // smile
-    // Rays (only when fully out)
-    if (sunPeek > -10) {
-      ctx.fillStyle = '#f4c430';
-      [[-22,12],[22,12],[-16,-2],[16,-2],[-16,26],[16,26]].forEach(function(r){
-        ctx.fillRect(W/2 + r[0], sunY + r[1], 6, 4);
-      });
-    }
-  }
-
-  // ── STATIC SUN/MOON in corner when sun is hidden ──
-  if (!sunVisible || ratio < 0.2) {
-    if (ratio < 0.2) {
-      // Moon
-      ctx.fillStyle = '#8a8aaa';
-      ctx.fillRect(W-60, 16, 20, 20);
-      ctx.fillStyle = '#6a6a8a';
-      ctx.fillRect(W-56, 20, 6, 6);
-    } else if (ratio >= 0.7) {
-      // Big bright sun in corner during celebration
-      ctx.fillStyle = '#ffe060';
-      ctx.fillRect(W-76, 10, 32, 32);
-      ctx.fillStyle = '#f4c430';
-      [[W-68,4],[W-68,46],[W-88,22],[W-38,22]].forEach(function(p){ ctx.fillRect(p[0],p[1],8,4); });
-    }
-  }
 
   // ── RAIN — only at very low progress (< 20%) ──
   if (ratio < 0.2) {
@@ -974,7 +886,7 @@ function drawWorld() {
   }
 
   // ── GROUND ──
-  var groundY = Math.floor(H * 0.65);
+  var groundY = Math.floor(H * 0.80);
   ctx.fillStyle = ratio >= 0.5 ? '#2a4a2a' : ratio >= 0.2 ? '#2a3a2a' : '#2a2a2a';
   ctx.fillRect(0, groundY, W, H - groundY);
   ctx.fillStyle = ratio >= 0.5 ? '#4ecb71' : ratio >= 0.2 ? '#3a7a50' : '#2a3a2a';
@@ -990,44 +902,6 @@ function drawWorld() {
       ctx.fillRect(px, groundY-12, 2, 12);
       ctx.fillStyle = pi%3===0 ? '#e05c5c' : pi%3===1 ? '#f4c430' : '#9b59b6';
       ctx.fillRect(px-3, groundY-16, 8, 6);
-    }
-  }
-
-  // ── EASTER BUNNIES (appear when ratio >= 0.2) ──
-  if (ratio >= 0.2) {
-    var numBunnies = ratio >= 0.5 ? 3 : 2;
-    var bunnySeeds = [{ox:180, speed:0.4}, {ox:340, speed:0.3}, {ox:520, speed:0.5}];
-    for (var bi = 0; bi < numBunnies; bi++) {
-      var bseed = bunnySeeds[bi];
-      // Hop: sine wave for vertical bounce
-      var hopPhase = (frameCount * bseed.speed + bi * 40) % 60;
-      var hopY = hopPhase < 30 ? Math.round(Math.sin(hopPhase / 30 * Math.PI) * -10) : 0;
-      var bx = bseed.ox;
-      var by2 = groundY - 14 + hopY;
-      // Body
-      ctx.fillStyle = '#f0e0d0';
-      ctx.fillRect(bx, by2 + 4, 10, 8);
-      // Head
-      ctx.fillRect(bx + 1, by2, 8, 6);
-      // Ears
-      ctx.fillRect(bx + 2, by2 - 6, 2, 6);
-      ctx.fillRect(bx + 6, by2 - 6, 2, 6);
-      // Inner ear pink
-      ctx.fillStyle = '#f0a0a0';
-      ctx.fillRect(bx + 3, by2 - 5, 1, 4);
-      ctx.fillRect(bx + 7, by2 - 5, 1, 4);
-      // Eye
-      ctx.fillStyle = '#1a1c2c';
-      ctx.fillRect(bx + 6, by2 + 2, 1, 1);
-      // Tail
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(bx - 2, by2 + 6, 3, 3);
-      // Easter egg the bunny carries (small coloured dot on ground below when landed)
-      if (hopY === 0) {
-        var eggColors = ['#e05c5c','#f4c430','#4ecb71','#9b59b6'];
-        ctx.fillStyle = eggColors[bi % eggColors.length];
-        ctx.fillRect(bx + 3, groundY - 4, 5, 4);
-      }
     }
   }
 
@@ -1240,43 +1114,52 @@ function drawWorld() {
   ctx.fillRect(cx2,   cy2+6, 12, 1); // top of band
   ctx.fillRect(cx2,   cy2+10,12, 1); // bottom of band
 
-  // ── SPEECH BUBBLE ──
+  // ── SPEECH BUBBLE — always ABOVE Josep, tail points DOWN toward his head ──
   if (josepState === 'showing') {
     var saying = josepCurrentSaying;
     ctx.font = '700 12px Inter, sans-serif';
     var catWidth = ctx.measureText(saying.cat).width;
     ctx.font = '400 11px Inter, sans-serif';
     var enWidth  = ctx.measureText('(' + saying.en + ')').width;
-    var bubW = Math.max(catWidth, enWidth) + 22;
-    var bubH = 44;
-    var bubX = josepX + 56;   // to the right of the donkey head
-    var bubY = by - 16;
-    if (bubX + bubW > W - 8) bubX = W - bubW - 8;
+    var bubW = Math.max(catWidth, enWidth) + 24;
+    var bubH = 46;
+    // Centre bubble above his head, clamped to canvas edges
+    var headCenterX = josepX + 20 + 7;
+    var bubX = Math.round(headCenterX - bubW / 2);
+    bubX = Math.max(8, Math.min(bubX, W - bubW - 8));
+    // Position well above ears (ears top at by-10)
+    var bubY = by - 10 - bubH - 22;
+    if (bubY < 6) bubY = 6;
 
+    // Bubble fill
     ctx.fillStyle = '#f4e8c1';
     ctx.fillRect(bubX, bubY, bubW, bubH);
+    // Border
     ctx.fillStyle = '#7b5e8a';
-    ctx.fillRect(bubX,        bubY,        bubW, 2);
-    ctx.fillRect(bubX,        bubY+bubH-2, bubW, 2);
-    ctx.fillRect(bubX,        bubY,        2,    bubH);
-    ctx.fillRect(bubX+bubW-2, bubY,        2,    bubH);
-    // Tail pointing left toward donkey
+    ctx.fillRect(bubX,          bubY,         bubW, 2);
+    ctx.fillRect(bubX,          bubY+bubH-2,  bubW, 2);
+    ctx.fillRect(bubX,          bubY+2,       2,    bubH-4);
+    ctx.fillRect(bubX+bubW-2,   bubY+2,       2,    bubH-4);
+    // Tail: 3-step pixel staircase pointing DOWN toward his head
+    var tX = Math.round(Math.min(bubX + bubW - 14, Math.max(bubX + 6, headCenterX - 4)));
     ctx.fillStyle = '#f4e8c1';
-    ctx.fillRect(bubX-6, bubY+16, 6, 4);
+    ctx.fillRect(tX,   bubY+bubH,   8, 3);
+    ctx.fillRect(tX+2, bubY+bubH+3, 4, 3);
+    ctx.fillRect(tX+3, bubY+bubH+6, 2, 3);
     ctx.fillStyle = '#7b5e8a';
-    ctx.fillRect(bubX-6, bubY+16, 2, 4);
-    ctx.fillRect(bubX-6, bubY+16, 6, 2);
-    ctx.fillRect(bubX-6, bubY+20, 6, 2);
-    ctx.fillStyle = '#f4e8c1';
-    ctx.fillRect(bubX-4, bubY+17, 2, 2);
+    ctx.fillRect(tX,   bubY+bubH,   2, 3);
+    ctx.fillRect(tX+6, bubY+bubH,   2, 3);
+    ctx.fillRect(tX+2, bubY+bubH+3, 2, 3);
+    ctx.fillRect(tX+4, bubY+bubH+3, 2, 3);
 
+    // Text
     ctx.fillStyle = '#2d2b55';
     ctx.font = '700 12px Inter, sans-serif';
     ctx.textBaseline = 'middle';
-    ctx.fillText(saying.cat, bubX + 10, bubY + 14);
+    ctx.fillText(saying.cat, bubX + 11, bubY + 16);
     ctx.fillStyle = '#6a5a8a';
     ctx.font = '400 11px Inter, sans-serif';
-    ctx.fillText('(' + saying.en + ')', bubX + 10, bubY + 30);
+    ctx.fillText('(' + saying.en + ')', bubX + 11, bubY + 32);
     ctx.textBaseline = 'alphabetic';
   }
 
@@ -1307,34 +1190,34 @@ function scolor(s){ return s==='high'?'var(--green)':s==='engaged'?'var(--blue)'
 var BINGO_SQUARES = [
   // Row 1
   {id:'first-post',       label:'First post ever',                           done:false},
-  {id:'intent-gap',       label:'Posted about the intent gap',               done:false},
-  {id:'intent-post',      label:'Posted about Intent Framework',             done:false},
-  {id:'100-words',        label:'Post under 100 words',                      done:false},
+  {id:'intent-gap',       label:'Intent Gap Report',                         done:false},
+  {id:'intent-post',      label:'Intent Framework',                          done:false},
+  {id:'100-words',        label:'Under 100 words',                           done:false},
   {id:'client-win',       label:'Shared a client win',                       done:false},
   // Row 2
-  {id:'agentic-campaign', label:'Posted about an agentic campaign',          done:false},
-  {id:'short-hook',       label:'Post that opens with 5 words or fewer',     done:false},
-  {id:'no-buzzwords',     label:'Post with zero buzzwords',                  done:false},
-  {id:'hot-take',         label:'Posted a hot take',                         done:false},
-  {id:'3-in-week',        label:'3 posts in one week',                       done:false},
+  {id:'agentic-campaign', label:'Agentic Campaigns',                         done:false},
+  {id:'analogy-post',     label:'Used a real-life analogy',                  done:false},
+  {id:'product-visits',   label:'Use case: Product Visits',                  done:false},
+  {id:'agentic-case',     label:'Agentic campaign case study',               done:false},
+  {id:'brew-with-intent', label:'Insight from Brew with Intent',             done:false},
   // Row 3
-  {id:'agentic-case',     label:'Posted an agentic campaign case study',     done:false},
-  {id:'personal-story',   label:'Shared a personal story',                   done:false},
-  {id:'FREE',             label:'FREE',                                      done:true},
-  {id:'no-ai-edits',      label:'Wrote it, didn\'t edit the AI output',      done:false},
-  {id:'analogy-post',     label:'Post using a real-life analogy',            done:false},
-  // Row 4
-  {id:'granola-post',     label:'Post from a Granola insight',               done:false},
-  {id:'brew-with-intent', label:'Posted about Brew with Intent (May 1)',     done:false},
-  {id:'question-post',    label:'Post that ends with a question',            done:false},
+  {id:'intent-gap-close', label:'Closing the intent gap',                    done:false},
+  {id:'social-proof',     label:'Customer Story: Social Proof',              done:false},
+  {id:'FREE',             label:'ANYTHING',                                  done:true},
+  {id:'elm-intent',       label:'Screenshot from Elm & Intent',             done:false},
   {id:'data-post',        label:'Led with a data point',                     done:false},
-  {id:'moment-post',      label:'Post about a specific moment from a call',  done:false},
+  // Row 4
+  {id:'prioritisation',   label:'Use case: Content Prioritisation',          done:false},
+  {id:'granola-post',     label:'Granola Insight',                           done:false},
+  {id:'tactical-play',    label:'Tactical Play',                             done:false},
+  {id:'buying-stages',    label:'Buying stages',                             done:false},
+  {id:'internal-call',    label:'Insight from internal call',                done:false},
   // Row 5
-  {id:'buying-stages',    label:'Posted about buying stages',                done:false},
-  {id:'no-hashtags',      label:'Post with zero hashtags',                   done:false},
-  {id:'abandonment-post', label:'Posted about abandonment',                  done:false},
-  {id:'image-post',       label:'Post with a real photo',                    done:false},
-  {id:'opinion-post',     label:'Posted a genuine opinion',                  done:false}
+  {id:'screen-recording', label:'Screen recording of setting up a campaign', done:false},
+  {id:'brand-repost',     label:'Repost of post from brand account',         done:false},
+  {id:'custom-campaigns', label:'Custom Campaigns',                          done:false},
+  {id:'app-screenshot',   label:'Post with screenshot of the app',           done:false},
+  {id:'basket-browse',    label:'Use case: Basket vs. Browse Abandonment',   done:false}
 ];
 
 var bingoState = JSON.parse(localStorage.getItem('pwi_bingo') || '{}');
@@ -1470,7 +1353,6 @@ function renderBingo() {
     }
     grid.appendChild(cell);
   });
-  checkBingoUnlock();
   checkBingoWin();
 }
 
@@ -1478,31 +1360,12 @@ function renderBingo() {
 var activeBingoSquare = null;
 
 function toggleBingoCell(id) {
-  // Only works when board is unlocked
-  var overlay = document.getElementById('bingo-lock-overlay');
-  if (overlay && overlay.style.display !== 'none') return;
   // Already claimed — don't allow re-logging
   if (bingoState[id]) { showToast('ALREADY CLAIMED'); return; }
   // Open the log post modal with this square as context
   var sq = BINGO_SQUARES.find(function(s){ return s.id === id; });
   activeBingoSquare = id;
   openLogPost(sq ? sq.emoji + ' ' + sq.label : '');
-}
-
-function checkBingoUnlock() {
-  var overlay = document.getElementById('bingo-lock-overlay');
-  if (!overlay) return;
-  // Use all-time post count (t.p > 0), not "posted this week" —
-  // the board unlocks once everyone has made their first post ever.
-  var allPosted = TEAM.every(function(t) { return t.p > 0; });
-  var statusEl = document.getElementById('bingo-unlock-status');
-  if (allPosted) {
-    overlay.style.display = 'none';
-  } else {
-    overlay.style.display = 'flex';
-    var posted = TEAM.filter(function(t){ return t.p > 0; }).length;
-    if (statusEl) statusEl.textContent = posted + ' of ' + TEAM.length + ' have posted';
-  }
 }
 
 function checkBingoWin() {
@@ -1534,12 +1397,12 @@ function renderLB() {
 
   calcFollowerGain();
   var hnEl = document.getElementById('hn'); if(hnEl) hnEl.textContent = TP;
-  var srEl = document.getElementById('s-remain'); if(srEl) srEl.textContent = Math.max(0, 35-TP);
+  var srEl = document.getElementById('s-remain'); if(srEl) srEl.textContent = Math.max(0, 15-TP);
   var wh = document.getElementById('weather-hint');
   if(wh) wh.textContent = TP===0 ? 'Post something to change the weather...' : TP<6 ? 'The sun is trying to come out...' : TP<30 ? 'Getting brighter with every post' : '';
-  var pfEl = document.getElementById('prog-fill'); if(pfEl) pfEl.style.width = Math.round(Math.min(1, TP/35)*100) + '%';
-  var pctEl = document.getElementById('prog-pct'); if(pctEl) pctEl.textContent = Math.round(Math.min(1, TP/35)*100) + '%';
-  var mms = [{id:'mm-6',n:6},{id:'mm-18',n:12},{id:'mm-30',n:18},{id:'mm-54',n:25},{id:'mm-100',n:35}];
+  var pfEl = document.getElementById('prog-fill'); if(pfEl) pfEl.style.width = Math.round(Math.min(1, TP/15)*100) + '%';
+  var pctEl = document.getElementById('prog-pct'); if(pctEl) pctEl.textContent = Math.round(Math.min(1, TP/15)*100) + '%';
+  var mms = [{id:'mm-6',n:3},{id:'mm-18',n:6},{id:'mm-30',n:9},{id:'mm-54',n:12},{id:'mm-100',n:15}];
   var nextSet = false;
   mms.forEach(function(m) {
     var el = document.getElementById(m.id);
@@ -1548,7 +1411,7 @@ function renderLB() {
     else if (!nextSet) { el.className = 'mm next'; nextSet = true; }
     else { el.className = 'mm far'; }
   });
-  var gapEl = document.getElementById('gap-label'); if(gapEl) gapEl.textContent = TP < 35 ? ((35-TP) + ' TO CLOSE THE GAP') : 'TARGET HIT';
+  var gapEl = document.getElementById('gap-label'); if(gapEl) gapEl.textContent = TP < 15 ? ((15-TP) + ' TO CLOSE THE GAP') : 'TARGET HIT';
   var sorted = TEAM.slice().sort(function(a,b){ return b.p - a.p; });
   var html = '';
   sorted.forEach(function(t, i) {
@@ -1581,45 +1444,12 @@ function renderAvatars() {
     var div = document.createElement('div');
     div.className = 'avatar-chip ' + (posted ? 'posted' : 'not-posted');
     div.title = "See " + t.n + " posts";
-    div.onclick = function() { openPersonDrawer(t.n); };
     div.innerHTML = '<div class="avatar-tick"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width="12" height="12"><path fill="#4ecb71" d="M7 14.2L2.8 10 1.4 11.4 7 17 19 5 17.6 3.6z"/></svg></div>'
       + '<div class="avatar-name">'+t.n+'</div>'
       + (posted && t.p > 0 ? '<div style="font-size:9px;font-weight:800;color:var(--gold);line-height:1;margin-top:2px">'+t.p+'</div>' : '');
     container.appendChild(div);
   });
   renderPostLogList();
-}
-
-function openPersonDrawer(name) {
-  var member = TEAM.find(function(t){ return t.n === name; });
-  if (!member) return;
-  document.getElementById('person-drawer-name').textContent = member.full || name;
-  var posts = (loggedPosts || []).filter(function(p){ return p.name === name; });
-  var countEl = document.getElementById('person-drawer-count');
-  countEl.textContent = posts.length === 0 ? 'No posts logged yet' : posts.length + ' post' + (posts.length === 1 ? '' : 's') + ' logged';
-  var postsEl = document.getElementById('person-drawer-posts');
-  if (!posts.length) {
-    postsEl.innerHTML = '<div style="padding:20px 0;text-align:center;color:var(--grey);font-size:13px">Nothing here yet.<br>Be the first to post!</div>';
-  } else {
-    var sorted = posts.slice().reverse();
-    var html = '';
-    sorted.forEach(function(p, i) {
-      var label = p.title ? p.title : 'Post ' + (sorted.length - i);
-      html += '<div style="padding:10px 0;border-bottom:1px solid var(--border2)">'
-        + '<div style="font-size:10px;color:var(--grey);margin-bottom:4px">'+p.date+'</div>'
-        + '<a href="'+p.url+'" target="_blank" style="font-size:13px;color:var(--blue);text-decoration:none;display:block;line-height:1.45">'
-        + label + ' &#8599;</a>'
-        + '</div>';
-    });
-    postsEl.innerHTML = html;
-  }
-  document.getElementById('person-drawer').classList.add('open');
-  document.getElementById('person-drawer-bg').classList.add('open');
-}
-
-function closePersonDrawer() {
-  document.getElementById('person-drawer').classList.remove('open');
-  document.getElementById('person-drawer-bg').classList.remove('open');
 }
 
 function renderPostLogList() {
@@ -1685,15 +1515,6 @@ function loadMe() {
 }
 
 // ── VOICE SETUP ───────────────────────────────────────────────────────────────
-function copyVoiceScript() {
-  var script = document.getElementById('voice-script-preview').textContent;
-  navigator.clipboard.writeText(script).then(function() {
-    var btn = document.getElementById('voice-copy-btn');
-    btn.textContent = 'COPIED!';
-    setTimeout(function(){ btn.textContent = 'COPY SCRIPT'; }, 2000);
-    showToast('SCRIPT COPIED — PASTE INTO COWORK');
-  });
-}
 function copyPostScript() {
   var script = document.getElementById('post-script-preview').textContent;
   navigator.clipboard.writeText(script).then(function() {
@@ -2198,6 +2019,23 @@ function openM(id){ document.getElementById(id).classList.add('open'); }
 function closeM(id){ document.getElementById(id).classList.remove('open'); }
 function bgC(e,id){ if(e.target===document.getElementById(id)) closeM(id); }
 function openRules(){ openM('rules-modal'); }
+function copyIdentityScript() {
+  var script = 'You\'re running a LinkedIn identity interview with me.\nThe goal is to help me figure out my personal voice and what I actually stand for on LinkedIn — not what the company wants, but what\'s genuinely mine. This will shape the topics I post about and how I write.\nRun this as a real conversation. One question at a time. Wait for my answer. React to what I say — if something is interesting, go deeper. If something is vague, push me to be more specific. Keep it human, not like a form.\nWe have four short phases. At the end, give me:\n1. A voice profile — 3-4 sentences describing how I actually communicate, based on what I said\n2. 3-4 personal posting pillars — topics that are genuinely mine, each with a one-line explanation of why it works for me and what kind of post it leads to (a client win, a personal take, a timely observation, a story)\n3. One post prompt — something specific I said that could become a real post this week, written as a prompt I can work from right now\n---\nStart here, in your own words:\n\\"Before we get into work — who are you outside your job? What do you actually spend time on, follow obsessively, or care about that has nothing to do with your role?\\"\nThen move through these phases naturally. Don\'t read the questions out. Adapt based on what I say.\nPHASE 1 — Who you are (not your job title)\n- What do you consume? Sport, podcasts, shows, games, creators, communities\n- How do you communicate with people — are you the one who tells the long story, drops the one-liner, or asks all the questions?\n- What could you talk about for an hour without preparing anything?\n- What do you believe that most people in your industry would push back on?\nPHASE 2 — Your work, honestly\n- What do you actually do day to day — and what part of it shows up in your head outside of work hours?\n- What\'s something that worked recently that you\'re quietly proud of?\n- What do you wish more people understood about what you do or the space you work in?\n- What would make you cringe about your own post — what\'s the version of you on LinkedIn you\'d be embarrassed by?\nPHASE 3 — Your LinkedIn why\n- Who are you actually trying to reach — or who would you want to stumble across your posts?\n- If someone read 10 of your posts, what would you want them to think about you?\n- What\'s actually stopping you from posting more — be honest, not polished\nPHASE 4 — This week\n- What\'s one thing that happened at work this week — a conversation, a result, something that surprised you, anything\n- What\'s something you noticed recently — inside or outside work — that made you think \\"that\'s interesting\\"\n---\nOnce you have my answers, synthesise and give me my voice profile, pillars, and one ready-to-use post prompt. Be specific. Reference what I actually said. No generic LinkedIn advice.';
+  navigator.clipboard.writeText(script).then(function() {
+    var el = document.getElementById('skills-copy-confirm');
+    if (el) { el.style.display = 'block'; setTimeout(function(){ el.style.display='none'; }, 3000); }
+    showToast('IDENTITY SCRIPT COPIED — PASTE INTO A NEW CLAUDE CHAT');
+  }).catch(function() {
+    var ta = document.createElement('textarea');
+    ta.value = script;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('IDENTITY SCRIPT COPIED');
+  });
+}
+
 function showToast(msg){ /* removed */ }
 
 // ── INIT ─────────────────────────────────────────────────────────────────────
@@ -2535,21 +2373,6 @@ resizeWorld();
 animWorld();
 </script>
 
-<!-- PERSON POST DRAWER -->
-<div class="person-drawer-bg" id="person-drawer-bg" onclick="closePersonDrawer()"></div>
-<div class="person-drawer" id="person-drawer">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
-    <div>
-      <div style="font-size:16px;font-weight:900;color:var(--gold)" id="person-drawer-name"></div>
-      <div style="font-size:12px;color:var(--cream2)" id="person-drawer-count"></div>
-    </div>
-    <button onclick="closePersonDrawer()" style="font-family:inherit;font-size:12px;font-weight:700;color:var(--cream2);background:transparent;border:2px solid var(--border2);padding:5px 10px;cursor:pointer">CLOSE</button>
-  </div>
-  <div id="person-drawer-posts"></div>
-  <div style="margin-top:16px">
-    <button onclick="closePersonDrawer();openLogPost();" style="font-family:inherit;font-size:12px;font-weight:800;background:var(--green);color:var(--bg);border:none;padding:10px 16px;cursor:pointer;width:100%;box-shadow:0 2px 0 #2a7a45">+ LOG A POST</button>
-  </div>
-</div>
 
 </body>
 </html>

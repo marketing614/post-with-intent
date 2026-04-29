@@ -1182,36 +1182,36 @@ function scolor(s){ return s==='high'?'var(--green)':s==='engaged'?'var(--blue)'
 
 // ── BINGO BOARD ──────────────────────────────────────────────────────────────
 var BINGO_SQUARES = [
-  // Row 1
-  {id:'first-post',       label:'First post ever',                           done:false},
-  {id:'intent-gap',       label:'Intent Gap Report',                         done:false},
-  {id:'intent-post',      label:'Intent Framework',                          done:false},
-  {id:'100-words',        label:'Under 100 words',                           done:false},
-  {id:'client-win',       label:'Shared a client win',                       done:false},
-  // Row 2
-  {id:'agentic-campaign', label:'Agentic Campaigns',                         done:false},
-  {id:'analogy-post',     label:'Used a real-life analogy',                  done:false},
-  {id:'product-visits',   label:'Use case: Product Visits',                  done:false},
-  {id:'agentic-case',     label:'Agentic campaign case study',               done:false},
-  {id:'brew-with-intent', label:'Insight from Brew with Intent',             done:false},
-  // Row 3
-  {id:'intent-gap-close', label:'Closing the intent gap',                    done:false},
-  {id:'social-proof',     label:'Customer Story: Social Proof',              done:false},
-  {id:'FREE',             label:'ANYTHING',                                  done:true},
-  {id:'elm-intent',       label:'Screenshot from Elm & Intent',             done:false},
-  {id:'data-post',        label:'Led with a data point',                     done:false},
-  // Row 4
-  {id:'prioritisation',   label:'Use case: Content Prioritisation',          done:false},
-  {id:'granola-post',     label:'Granola Insight',                           done:false},
-  {id:'customer-story-uc',label:'Customer Story',                            done:false},
-  {id:'buying-stages',    label:'Buying stages',                             done:false},
-  {id:'internal-call',    label:'Insight from internal call',                done:false},
-  // Row 5
-  {id:'screen-recording', label:'Screen recording of setting up a campaign', done:false},
-  {id:'brand-repost',     label:'Repost of brand account post',              done:false},
-  {id:'custom-campaigns', label:'Custom Campaigns',                          done:false},
-  {id:'app-screenshot',   label:'Post with screenshot of the app',           done:false},
-  {id:'basket-browse',    label:'Use case: Basket vs. Browse Abandonment',   done:false}
+  // Row 1 — Personal
+  {id:'first-post',       label:'First post ever',                               done:false},
+  {id:'100-words',        label:'Post under 100 words',                          done:false},
+  {id:'analogy-post',     label:'Used a real-life analogy',                      done:false},
+  {id:'data-post',        label:'Led with a data point',                         done:false},
+  {id:'brand-repost',     label:'Repost of brand account post',                  done:false},
+  // Row 2 — Intent Gap
+  {id:'intent-gap',       label:'Insight from the Intent Gap Report',            done:false},
+  {id:'intent-post',      label:'Intent Framework',                              done:false},
+  {id:'intent-gap-close', label:'Insight from Closing the Intent Gap Report',    done:false},
+  {id:'buying-stages',    label:'Buying stages',                                 done:false},
+  {id:'granola-post',     label:'Shared an insight from Granola call',           done:false},
+  // Row 3 — Agentic Campaigns (FREE square in centre)
+  {id:'agentic-campaign', label:'Agentic Campaigns',                             done:false},
+  {id:'agentic-case',     label:'Agentic Campaign case study',                   done:false},
+  {id:'FREE',             label:'ANYTHING',                                      done:true },
+  {id:'screen-recording', label:'Screen recording of setting up a campaign',     done:false},
+  {id:'custom-campaigns', label:'Custom Campaigns',                              done:false},
+  // Row 4 — Use Cases / Features
+  {id:'product-visits',   label:'Use case: Product Visits',                      done:false},
+  {id:'basket-browse',    label:'Use case: Basket vs. Browse abandonment',       done:false},
+  {id:'social-proof-uc',  label:'Use case: Social Proof',                        done:false},
+  {id:'app-screenshot',   label:'Post with screenshot of the app',               done:false},
+  {id:'customer-story-uc',label:'Customer Story',                                done:false},
+  // Row 5 — Customer Story
+  {id:'client-win',       label:'Shared a client win',                           done:false},
+  {id:'social-proof',     label:'Customer Story on Social Proof',                done:false},
+  {id:'elm-intent',       label:'Post with Screenshot from Elm & intent',        done:false},
+  {id:'brew-with-intent', label:'Insight from Brew with Intent',                 done:false},
+  {id:'intent-lens',      label:'Post with screenshot of Intent Lens',           done:false}
 ];
 
 var BINGO_SEASON = 'round-2';

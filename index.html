@@ -511,7 +511,7 @@ canvas#world { display: block; width: 100%; height: 100%; image-rendering: pixel
       <div class="live-dot-wrap"><div class="live-dot"></div>LIVE</div>
       <button class="user-btn" id="u-btn" onclick="openWho()">ADD YOUR NAME</button>
       <button class="user-btn" onclick="openRules()" style="color:var(--cream2)">RULES &amp; INFO</button>
-      <button class="user-btn" onclick="loadPostsFromNotion()" style="color:var(--cream2)" title="Refresh scores from Notion">REFRESH</button>
+      <button class="user-btn" onclick="loadPostsFromNotion(true)" style="color:var(--cream2)" title="Refresh scores from Notion">REFRESH</button>
     <button id="mwi-post-btn" style="display:none;font-family:inherit;font-size:13px;font-weight:700;color:var(--gold);background:var(--panel2);border:2px solid var(--gold);padding:6px 14px;cursor:pointer;box-shadow:2px 2px 0 #7a5a00" onclick="openLogCompanyPost()">+ MWI POST</button>
     </div>
   </div>
@@ -1245,9 +1245,10 @@ function isThisWeek(dateStr) {
   return d >= startOfWeek && d <= endOfWeek;
 }
 
-async function loadPostsFromNotion() {
+async function loadPostsFromNotion(showFeedback) {
+  if (showFeedback) showToast('REFRESHING...');
   try {
-    const res = await fetch('https://post-with-intent-proxy.sara-690.workers.dev/api/leaderboard');
+    const res = await fetch('https://post-with-intent-proxy.sara-690.workers.dev/api/leaderboard?t=' + Date.now());
     const data = await res.json();
     loggedPosts = Object.entries(data.posts).flatMap(([person, posts]) =>
       posts.map(p => ({ name: person, url: p.url, date: p.date, title: p.title || '' }))
@@ -1270,7 +1271,8 @@ async function loadPostsFromNotion() {
       saveBingo();
     }
     renderLB(); renderAvatars(); renderBingo();
-  } catch(e) { console.error('Failed to load posts', e); }
+    if (showFeedback) showToast('SCORES UPDATED');
+  } catch(e) { console.error('Failed to load posts', e); if (showFeedback) showToast('REFRESH FAILED'); }
 }
 loadPostsFromNotion();
    

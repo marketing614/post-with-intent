@@ -1257,6 +1257,18 @@ async function loadPostsFromNotion() {
     TEAM.forEach(function(t) {
       t.posted = (data.posts[t.n] || []).some(function(p) { return isThisWeek(p.date); });
     });
+    // Rebuild bingo state from Notion — authoritative source so squares survive
+    // cache clears, device switches, and code deploys.
+    if (data.bingo) {
+      Object.entries(data.bingo).forEach(function([person, squares]) {
+        if (squares.length > 0) {
+          _bingoStore[person] = {};
+          squares.forEach(function(sq) { _bingoStore[person][sq] = true; });
+        }
+      });
+      _bingoStore.__season = BINGO_SEASON;
+      saveBingo();
+    }
     renderLB(); renderAvatars(); renderBingo();
   } catch(e) { console.error('Failed to load posts', e); }
 }
@@ -2116,11 +2128,12 @@ function submitLogPost() {
   renderLogHistory();
   showToast('+1 POINT LOGGED');
 
-  // If this log came from a bingo square, mark it claimed and check for a completed line.
-  // bingoCompleted is captured BEFORE clearing activeBingoSquare so the worker knows.
+  // If this log came from a bingo square, capture the square ID before clearing it,
+  // mark it claimed locally, and check if a line is now complete.
+  var claimedSquare = activeBingoSquare || null;
   var bingoCompleted = false;
-  if (activeBingoSquare) {
-    myBingo()[activeBingoSquare] = true;
+  if (claimedSquare) {
+    myBingo()[claimedSquare] = true;
     saveBingo();
     activeBingoSquare = null;
     renderBingo();
@@ -2128,12 +2141,12 @@ function submitLogPost() {
   }
 
   // Save to Notion via Cloudflare so the point persists after refresh.
-  // bingoCompleted tells the worker to fire the Bingo Slack notification.
+  // bingoSquare persists which square was claimed so bingo state survives deploys and device switches.
   var today = new Date().toISOString().split('T')[0];
   fetch('https://post-with-intent-proxy.sara-690.workers.dev/api/log-post', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ person: me.n, linkedinUrl: url, date: today, openingLine: openingLine, bingoCompleted: bingoCompleted })
+    body: JSON.stringify({ person: me.n, linkedinUrl: url, date: today, openingLine: openingLine, bingoCompleted: bingoCompleted, bingoSquare: claimedSquare })
   }).catch(function(e) { console.error('Failed to save to Notion', e); });
 }
 
